@@ -6,8 +6,7 @@ export default function Home() {
     <div className={styles.page}>
       <main className={styles.main}>
         {/* Added H1 tag with Tailwind classes */}
-        <h1 className="text-red-500 text-3xl font-bold mb-4">Hello Tailwind! This text should be red, large, and bold.</h1>
-
+        <h1 className="text-emerald-600 text-6xl italic">Hello from the Laptop, confirmed on Desktop!</h1>
         <Image
           className={styles.logo}
           src="/next.svg"
