@@ -1,3 +1,9 @@
+/* src/app/globals.css */
+
+/* Tailwind CSS import - this should come first, as per your manual */
+@import "tailwindcss";
+
+/* Your original Next.js default styles - these provide base styling */
 :root {
   --background: #ffffff;
   --foreground: #171717;
