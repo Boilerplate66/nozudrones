@@ -1,5 +1,3 @@
-// components/NozuLogo.js
-
 import React from 'react';
 
 // This component renders the NozuDrones SVG logo.
@@ -9,7 +7,8 @@ import React from 'react';
 const NozuLogo = ({ width = 90, height = 90, className = '', ...props }) => {
   return (
     <svg
-      style={{ maxHeight: '500px' }}
+      // Corrected viewBox to match the actual aspect ratio of your NozuDrones logo SVG.
+      // This ensures the logo maintains its correct oval shape and does not stretch.
       viewBox="9.433704 9.767896995708155 320.409018 138.09785407725323"
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink" // Note: xmlns:xlink is written as xmlnsXlink in React JSX
