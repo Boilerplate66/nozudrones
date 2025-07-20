@@ -1,48 +1,53 @@
 /* src/app/globals.css */
 
-/* Tailwind CSS import - this should come first, as per your manual */
+/* Tailwind CSS import - this should come first */
 @import "tailwindcss";
 
-/* Your original Next.js default styles - these provide base styling */
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Define your specific custom color palette using @theme */
+@theme {
+  /* --- Core Aesthetic Colors (DJI/Apple Inspired) --- */
+  /* These colors are intended for primary use across the site to achieve the desired aesthetic. */
+  --color-nozu-sky-blue: #E0E8F0; /* Light background */
+  --color-nozu-dark-grey: #1F2937; /* Dark text */
+  --color-nozu-medium-grey: #6B7280; /* Intermediate grey for specific text */
+  --color-nozu-white: #FFFFFF; /* Pure white */
+  --color-nozu-light-grey: #F0F4F8; /* Light grey for subtle backgrounds/borders */
+
+  /* Primary Accent Blue: Subdued, close to DJI/Apple but distinct. */
+  /* This blue is designed to be sophisticated and used sparingly for accents. */
+  --color-nozu-electric-blue: #0064C8; /* New subdued Electric Blue (RGB: 0, 100, 200) */
+  --color-nozu-darker-electric-blue: #0050A0; /* New darker Electric Blue for hovers/accents (RGB: 0, 80, 160) */
+
+  /* --- Defined Colors for Future/Specific Use (Less prominent in current aesthetic) --- */
+  /* These colors are retained for potential future use or specific branding needs, */
+  /* but should be used very sparingly or not at all in the current DJI/Apple aesthetic. */
+  --color-nozu-orange: #FF8C00; /* Original vibrant Orange */
+  --color-nozu-lime-green-refined: #32CD32; /* Original specific Lime Green */
+  --color-nozu-magenta: #E03080; /* Original Magenta */
+  --color-nozu-golden-yellow: #FFBF00; /* Original Golden Yellow */
+  --color-nozu-deep-teal: #008080; /* Original Deep Teal */
+
+  --font-sans: Arial, Helvetica, sans-serif; /* Matching your page.js font-sans */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Global body styles using your new custom properties */
 html,
 body {
   max-width: 100vw;
-  overflow-x: hidden;
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Set a default background and font for the entire page using your new custom properties */
+  background-color: var(--color-nozu-sky-blue);
+  font-family: var(--font-sans);
+  color: var(--color-nozu-dark-grey);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
+/* Link reset */
 a {
   color: inherit;
   text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
 }
