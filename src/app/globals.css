@@ -5,27 +5,20 @@
 
 /* Define your specific custom color palette using @theme */
 @theme {
-  /* --- Core Aesthetic Colors (DJI/Apple Inspired) --- */
-  /* These colors are intended for primary use across the site to achieve the desired aesthetic. */
   --color-nozu-sky-blue: #E0E8F0; /* Light background */
   --color-nozu-dark-grey: #1F2937; /* Dark text */
+  --color-nozu-electric-blue: #0077ff; /* Updated Electric Blue */
+  --color-nozu-orange: #FF8C00; /* Your vibrant Orange */
+  --color-nozu-lime-green-refined: #32CD32; /* Your specific Lime Green */
   --color-nozu-medium-grey: #6B7280; /* Intermediate grey for specific text */
+  --color-nozu-darker-electric-blue: #005fcc; /* Updated Darker Electric Blue for hovers/accents */
   --color-nozu-white: #FFFFFF; /* Pure white */
-  --color-nozu-light-grey: #F0F4F8; /* Light grey for subtle backgrounds/borders */
+  --color-nozu-light-grey: #F0F4F8; /* Light grey for placeholder logo background */
 
-  /* Primary Accent Blue: Subdued, close to DJI/Apple but distinct. */
-  /* This blue is designed to be sophisticated and used sparingly for accents. */
-  --color-nozu-electric-blue: #0064C8; /* New subdued Electric Blue (RGB: 0, 100, 200) */
-  --color-nozu-darker-electric-blue: #0050A0; /* New darker Electric Blue for hovers/accents (RGB: 0, 80, 160) */
-
-  /* --- Defined Colors for Future/Specific Use (Less prominent in current aesthetic) --- */
-  /* These colors are retained for potential future use or specific branding needs, */
-  /* but should be used very sparingly or not at all in the current DJI/Apple aesthetic. */
-  --color-nozu-orange: #FF8C00; /* Original vibrant Orange */
-  --color-nozu-lime-green-refined: #32CD32; /* Original specific Lime Green */
-  --color-nozu-magenta: #E03080; /* Original Magenta */
-  --color-nozu-golden-yellow: #FFBF00; /* Original Golden Yellow */
-  --color-nozu-deep-teal: #008080; /* Original Deep Teal */
+  /* NEW BOLD ACCENT COLORS: */
+  --color-nozu-magenta: #E03080;
+  --color-nozu-golden-yellow: #FFBF00;
+  --color-nozu-deep-teal: #008080;
 
   --font-sans: Arial, Helvetica, sans-serif; /* Matching your page.js font-sans */
 }
