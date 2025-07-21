@@ -1,29 +1,11 @@
 /* src/app/globals.css */
 
-/* Tailwind CSS import - this should come first */
-@import "tailwindcss";
+/* Tailwind CSS v3 directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Define your specific custom color palette using @theme */
-@theme {
-  --color-nozu-sky-blue: #E0E8F0; /* Light background */
-  --color-nozu-dark-grey: #1F2937; /* Dark text */
-  --color-nozu-electric-blue: #0077ff; /* Updated Electric Blue */
-  --color-nozu-orange: #FF8C00; /* Your vibrant Orange */
-  --color-nozu-lime-green-refined: #32CD32; /* Your specific Lime Green */
-  --color-nozu-medium-grey: #6B7280; /* Intermediate grey for specific text */
-  --color-nozu-darker-electric-blue: #005fcc; /* Updated Darker Electric Blue for hovers/accents */
-  --color-nozu-white: #FFFFFF; /* Pure white */
-  --color-nozu-light-grey: #F0F4F8; /* Light grey for placeholder logo background */
-
-  /* NEW BOLD ACCENT COLORS: */
-  --color-nozu-magenta: #E03080;
-  --color-nozu-golden-yellow: #FFBF00;
-  --color-nozu-deep-teal: #008080;
-
-  --font-sans: Arial, Helvetica, sans-serif; /* Matching your page.js font-sans */
-}
-
-/* Global body styles using your new custom properties */
+/* Global body styles */
 html,
 body {
   max-width: 100vw;
@@ -31,10 +13,10 @@ body {
 }
 
 body {
-  /* Set a default background and font for the entire page using your new custom properties */
-  background-color: var(--color-nozu-sky-blue);
-  font-family: var(--font-sans);
-  color: var(--color-nozu-dark-grey);
+  /* Apply default background and text color using theme() function,
+     which will now resolve directly from tailwind.config.js. */
+  background-color: theme('colors.nozu-sky-blue');
+  color: theme('colors.nozu-dark-grey');
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

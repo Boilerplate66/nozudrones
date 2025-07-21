@@ -1,7 +1,9 @@
+// src/components/HeaderWrapper.jsx
 "use client"; // This component contains client-side interactivity
 
 import React, { useState } from 'react';
 import NozuLogo from './NozuLogo'; // Corrected path: NozuLogo is now in the same directory (src/components)
+import Link from 'next/link'; // Import Link for client-side navigation
 
 export default function HeaderWrapper() {
   const [isMobileMenuOpen, setIsMobileMenuMenuOpen] = useState(false); // State for mobile menu visibility
@@ -19,7 +21,12 @@ export default function HeaderWrapper() {
       <div className="flex items-center flex-shrink-0">
         {/* Hamburger for mobile (visible only on md:hidden) */}
         <div className="md:hidden">
-          <button onClick={toggleMobileMenu} className="text-nozu-dark-grey focus:outline-none focus:ring-2 focus:ring-nozu-electric-blue rounded-md p-0 flex items-center justify-center">
+          <button
+            onClick={toggleMobileMenu}
+            className="text-nozu-dark-grey focus:outline-none focus:ring-2 focus:ring-nozu-electric-blue rounded-md p-0 flex items-center justify-center"
+            aria-expanded={isMobileMenuOpen} // Accessibility: indicates if menu is expanded
+            aria-controls="mobile-menu-overlay" // Accessibility: links to the menu element
+          >
             <svg className="w-9 h-9 block align-middle" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
@@ -28,9 +35,10 @@ export default function HeaderWrapper() {
 
         {/* Desktop Logo and Name/Strapline Group (hidden on mobile) */}
         <div className="hidden md:flex items-end space-x-6"> {/* Use items-end for desktop alignment */}
-          <a href="/" aria-label="NozuDrones Home">
+          {/* Use Link for internal navigation */}
+          <Link href="/" aria-label="NozuDrones Home">
             <NozuLogo width={144} height={62} /> {/* Desktop size */}
-          </a>
+          </Link>
           <div>
             <h1 className="text-4xl font-extrabold text-nozu-dark-grey mt-1">NozuDrones</h1>
             <p className="text-base text-nozu-medium-grey italic mt-0">Your UK Drone Companion</p>
@@ -42,20 +50,22 @@ export default function HeaderWrapper() {
       <div className="flex-grow flex items-center justify-center md:justify-center">
         {/* Mobile Logo (visible only on mobile) */}
         <div className="md:hidden">
-          <a href="/" aria-label="NozuDrones Home">
+          {/* Use Link for internal navigation */}
+          <Link href="/" aria-label="NozuDrones Home">
             <NozuLogo width={80} height={35} />
-          </a>
+          </Link>
         </div>
 
         {/* Desktop Navigation (hidden on mobile) */}
         <nav className="hidden md:block">
           <ul className="flex space-x-14 text-nozu-dark-grey font-semibold text-lg">
-            <li><a href="/reviews" className="hover:text-nozu-electric-blue transition-colors duration-200">Drone Reviews</a></li>
-            <li><a href="/guides" className="hover:text-nozu-electric-blue transition-colors duration-200">Buying Guides</a></li>
-            <li><a href="/laws" className="hover:text-nozu-electric-blue transition-colors duration-200">UK Drone Laws</a></li>
-            <li><a href="/safety" className="hover:text-nozu-electric-blue transition-colors duration-200">Safety Tips</a></li>
-            <li><a href="/about" className="hover:text-nozu-electric-blue transition-colors duration-200">About Us</a></li>
-            <li><a href="/contact" className="hover:text-nozu-electric-blue transition-colors duration-200">Contact</a></li>
+            {/* Use Link for internal navigation */}
+            <li><Link href="/reviews" className="hover:text-nozu-electric-blue transition-colors duration-200">Drone Reviews</Link></li>
+            <li><Link href="/guides" className="hover:text-nozu-electric-blue transition-colors duration-200">Buying Guides</Link></li>
+            <li><Link href="/laws" className="hover:text-nozu-electric-blue transition-colors duration-200">UK Drone Laws</Link></li>
+            <li><Link href="/safety" className="hover:text-nozu-electric-blue transition-colors duration-200">Safety Tips</Link></li>
+            <li><Link href="/about" className="hover:text-nozu-electric-blue transition-colors duration-200">About Us</Link></li>
+            <li><Link href="/contact" className="hover:text-nozu-electric-blue transition-colors duration-200">Contact</Link></li>
           </ul>
         </nav>
       </div>
@@ -72,19 +82,20 @@ export default function HeaderWrapper() {
 
       {/* Mobile Menu Overlay (full screen) */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-0 left-0 w-full h-screen bg-nozu-white bg-opacity-95 backdrop-blur-md z-40 flex flex-col items-center justify-center space-y-8">
+        <div id="mobile-menu-overlay" className="md:hidden absolute top-0 left-0 w-full h-screen bg-nozu-white bg-opacity-95 backdrop-blur-md z-40 flex flex-col items-center justify-center space-y-8">
           <button onClick={toggleMobileMenu} className="absolute top-4 right-4 text-nozu-dark-grey focus:outline-none focus:ring-2 focus:ring-nozu-electric-blue rounded-md p-2">
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
           <ul className="flex flex-col space-y-6 text-nozu-dark-grey font-semibold text-2xl">
-            <li><a href="/reviews" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">Drone Reviews</a></li>
-            <li><a href="/guides" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">Buying Guides</a></li>
-            <li><a href="/laws" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">UK Drone Laws</a></li>
-            <li><a href="/safety" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">Safety Tips</a></li>
-            <li><a href="/about" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">About Us</a></li>
-            <li><a href="/contact" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">Contact</a></li>
+            {/* Use Link for internal navigation and close menu on click */}
+            <li><Link href="/reviews" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">Drone Reviews</Link></li>
+            <li><Link href="/guides" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">Buying Guides</Link></li>
+            <li><Link href="/laws" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">UK Drone Laws</Link></li>
+            <li><Link href="/safety" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">Safety Tips</Link></li>
+            <li><Link href="/about" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">About Us</Link></li>
+            <li><Link href="/contact" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">Contact</Link></li>
           </ul>
         </div>
       )}
