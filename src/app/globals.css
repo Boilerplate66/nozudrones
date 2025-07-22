@@ -6,16 +6,20 @@
 @tailwind utilities;
 
 /* Global body styles */
+html {
+  scroll-behavior: smooth; /* Added for smooth scrolling on anchor links */
+}
+
 html,
 body {
   max-width: 100vw;
   overflow-x: hidden; /* Prevent horizontal scroll */
+  /* overflow-y: auto; is not needed here as min-h-screen on body in layout.jsx handles vertical scroll */
+  height: 100%;       /* Ensure html takes full viewport height for sticky to work */
 }
 
 body {
-  /* Apply default background and text color using theme() function,
-     which will now resolve directly from tailwind.config.js. */
-  background-color: theme('colors.nozu-sky-blue');
+  /* Removed background-color here to allow page components to define their own backgrounds */
   color: theme('colors.nozu-dark-grey');
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -25,4 +29,31 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+/* Hide scrollbar for Webkit browsers (Chrome, Safari) */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for Firefox */
+.hide-scrollbar {
+    scrollbar-width: none; /* Firefox */
+}
+
+.contents-menu-item {
+  position: relative; /* Needed for ::before pseudo-element positioning */
+  padding-left: 1.5rem; /* Make space for the indicator bar */
+}
+
+.contents-menu-item.active::before {
+  content: '';
+  position: absolute;
+  left: -4px; /* Adjusted to move left by a few pixels */
+  top: 50%; /* Vertically center the bar */
+  transform: translateY(-50%);
+  width: 4px; /* Thickness of the bar */
+  height: 80%; /* Height of the bar relative to the list item */
+  background-color: hsl(217, 7%, 52%); /* Changed to nozu-medium-grey HSL value */
+  border-radius: 2px; /* Slightly rounded ends */
 }

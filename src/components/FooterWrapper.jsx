@@ -14,15 +14,33 @@ export default function FooterWrapper() {
   ];
 
   return (
-    // Footer Section
-    <footer className="text-center text-sm text-nozu-medium-grey py-8 bg-nozu-white relative z-10 shadow-xl">
-      <div className="max-w-6xl mx-auto px-6">
+    // Footer Section - Removed top padding as the bar will provide it
+    <footer className="text-center text-sm text-nozu-medium-grey bg-nozu-white relative z-10 shadow-xl">
+      {/* Full-width dark grey bar for headings */}
+      <div className="bg-nozu-dark-grey text-white py-4">
+        {/* This div now spans full width, and its content is centered with max-w-6xl */}
+        {/* Added consistent responsive padding here */}
+        <div className="max-w-6xl mx-auto px-6 md:px-10 lg:px-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-left">
+            {/* Heading for Column 1: Products */}
+            <h3 className="text-lg font-semibold">Products</h3>
+            {/* Heading for Column 2: About Us */}
+            <h3 className="text-lg font-semibold">About Us</h3>
+            {/* Heading for Column 3: Legal */}
+            <h3 className="text-lg font-semibold">Legal</h3>
+            {/* Heading for Column 4: Connect */}
+            <h3 className="text-lg font-semibold">Connect</h3>
+          </div>
+        </div>
+      </div>
+
+      {/* Content below the bar, within the max-w-6xl container, with adjusted top padding */}
+      {/* Added consistent responsive padding here as well */}
+      <div className="max-w-6xl mx-auto px-6 md:px-10 lg:px-12 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-left mb-12">
-          {/* Column 1: Products */}
+          {/* Column 1: Products Links */}
           <div>
-            <h3 className="text-lg font-semibold text-nozu-dark-grey mb-4">Products</h3>
             <ul className="space-y-2">
-              {/* Use Link for internal navigation */}
               <li><Link href="/products/beginner" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">Beginner Drones</Link></li>
               <li><Link href="/products/professional" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">Professional Drones</Link></li>
               <li><Link href="/products/accessories" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">Accessories</Link></li>
@@ -30,11 +48,9 @@ export default function FooterWrapper() {
             </ul>
           </div>
 
-          {/* Column 2: About Us */}
+          {/* Column 2: About Us Links */}
           <div>
-            <h3 className="text-lg font-semibold text-nozu-dark-grey mb-4">About Us</h3>
             <ul className="space-y-2">
-              {/* Use Link for internal navigation */}
               <li><Link href="/about" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">About Us</Link></li>
               <li><Link href="/about-nozu" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">About Nozu</Link></li>
               <li><Link href="/contact" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">Contact Us</Link></li>
@@ -43,12 +59,10 @@ export default function FooterWrapper() {
             </ul>
           </div>
 
-          {/* Column 3: Legal */}
+          {/* Column 3: Legal Links */}
           <div>
-            <h3 className="text-lg font-semibold text-nozu-dark-grey mb-4">Legal</h3>
             <ul className="space-y-2">
-              {/* Use Link for internal navigation */}
-              <li><Link href="/privacy" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">Privacy Policy</Link></li>
+              <li><Link href="/legal/privacy-policy" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">Privacy Policy</Link></li>
               <li><Link href="/terms" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">Terms of Service</Link></li>
               <li><Link href="/cookies" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">Cookie Settings</Link></li>
               <li><Link href="/disclaimer" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">Disclaimer</Link></li>
@@ -56,9 +70,8 @@ export default function FooterWrapper() {
             </ul>
           </div>
 
-          {/* Column 4: Connect */}
+          {/* Column 4: Connect Icons */}
           <div>
-            <h3 className="text-lg font-semibold text-nozu-dark-grey mb-4">Connect</h3>
             <div className="flex space-x-4 mb-6">
               {/* Email Icon (Inline SVG) - Mailto link does not use Next.js Link */}
               <a href="mailto:hello@nozudrones.co.uk" aria-label="Email Us" className="text-nozu-dark-grey hover:text-nozu-electric-blue transition-colors duration-200">
