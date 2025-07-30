@@ -1,20 +1,15 @@
 // src/app/legal/privacy-policy/page.jsx
 "use client"; // This directive marks the component as a Client Component
 
-import React, { useState, useEffect, useRef } from 'react'; // Import useState, useEffect, useRef
-import Markdown from 'react-markdown'; // Import a Markdown renderer
-import remarkGfm from 'remark-gfm'; // Plugin for GitHub Flavored Markdown (tables, task lists, etc.)
-import Link from 'next/link'; // Import Link for internal navigation
-
-// Removed export const metadata as it's not allowed in a "use client" component.
-// Metadata for this page will be handled by the parent layout.jsx or a dedicated legal layout.
+import React, { useEffect, useState, useRef } from 'react';
+import Markdown from 'react-markdown';
+import { Link as ScrollLink, Element, Events, scroller } from 'react-scroll';
+import NextLink from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 // Import your Privacy Policy content directly as a string
-// IMPORTANT: Changed the first heading from # to ## to avoid redundancy with the sticky title bar
 const privacyPolicyContent = `
-## Privacy Policy for NozuDrones.co.uk
-
-**Last Updated: July 22, 2025**
+### Privacy Policy for NozuDrones.co.uk
 
 NozuDrones.co.uk ("we," "our," or "us") is committed to protecting your privacy and handling your data in an open and transparent manner. This Privacy Policy outlines our practices concerning the collection, use, disclosure, and safeguarding of your information when you visit our website at [www.nozudrones.co.uk](https://www.nozudrones.co.uk) (the "Site"). We urge you to review this Privacy Policy thoroughly. Your continued access or use of the Site signifies your agreement to the terms herein.
 
@@ -27,10 +22,10 @@ Our data collection practices are designed to be minimal and focused on improvin
 #### Non-Personal Data
 
 We automatically collect certain non-personally identifiable information when you access the Site. This includes, but is not limited to:
-* **Browser and Device Information:** Type of browser (e.e.g., Chrome, Firefox), operating system (e.e.g., Windows, macOS, Android, iOS), device type (e.e.g., desktop, mobile, tablet), screen resolution, and language settings.
+* **Browser and Device Information:** Type of browser (e.g., Chrome, Firefox), operating system (e.g., Windows, macOS, Android, iOS), device type (e.g., desktop, mobile, tablet), screen resolution, and language settings.
 * **Usage Data:** Pages viewed, time spent on pages, clickstream data, referral sources (the website you came from), exit pages, and navigation paths within the Site.
-* **IP Address:** Your Internet Protocol (IP) address is collected, but it is primarily used for broad geographical analysis (e.g., country-level) and security purposes, not for individual identification.
-* **Technical Information:** Data related to how you interact with our Site's features, suchs as video playback events (play, pause, completion) and button clicks.
+* **IP Address:** Your Internet Protocol (IP address) is collected, but it is primarily used for broad geographical analysis (e.g., country-level) and security purposes, not for individual identification.
+* **Technical Information:** Data related to how you interact with our Site's features, such as video playback events (play, pause, completion) and button clicks.
 
 This non-personal data is collected through standard web server logs and analytics tools, primarily Google Analytics 4 (GA4). This data is anonymized where possible and aggregated to understand overall user behavior, identify trends, and enhance the performance, content, and user experience of our website. We do not use this data to identify individual users.
 
@@ -80,16 +75,16 @@ Our Site contains links to external websites that are not operated by us. These 
 
 When you click on these third-party links, you will be directed to their respective websites. These external sites have their own independent privacy policies, terms of service, and data collection practices. We strongly advise you to review the Privacy Policy of every site you visit. We have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.
 
-Please be aware that when you click on an affiliate link and subsequently make a purchase on a third-party website, we may earn a commission. This process involves the use of tracking technologies (e.e.g., cookies placed by the affiliate network) to attribute the sale to our Site. This tracking is managed by the affiliate networks and the retailers, not directly by NozuDrones.co.uk, and does not involve us collecting your personal purchase details.
+Please be aware that when you click on an affiliate link and subsequently make a purchase on a third-party website, we may earn a commission. This process involves the use of tracking technologies (e.g., cookies placed by the affiliate network) to attribute the sale to our Site. This tracking is managed by the affiliate networks and the retailers, not directly by NozuDrones.co.uk, and does not involve us collecting your personal purchase details.
 
 ### Cookies and Tracking Technologies
 
-NozuDrones.co.uk does not directly use first-party cookies for tracking or personalization purposes. However, certain third-party services integrated into our Site may use cookies and similar tracking technologies (e.e.g., pixels, web beacons) to collect information. These include:
+NozuDrones.co.uk does not directly use first-party cookies for tracking or personalization purposes. However, certain third-party services integrated into our Site may use cookies and similar tracking technologies (e.g., pixels, web beacons) to collect information. These include:
 
 * **Google Analytics 4 (GA4):** GA4 uses cookies to collect anonymized data about website usage, suchs as session duration, pages viewed, and user demographics (if available). This helps us understand how users interact with our Site.
 * **Affiliate Networks:** As mentioned in Section 5, affiliate networks may use cookies to track referrals from our Site to their merchant partners, enabling us to earn commissions.
 
-You have the ability to accept or decline cookies. Most web browsers automatically accept cookies, but you can usually modify your browser setting to decline cookies if you prefer. Please note that if you choose to decline cookies, it.e.g., may affect the functionality of some parts of our Site or third-party sites you visit via our links. For more detailed information on how we use cookies and how you can manage your preferences, please visit our dedicated <Link href="/legal/cookie-settings" className="text-nozu-electric-blue hover:underline">Cookie Settings</Link> page.
+You have the ability to accept or decline cookies. Most web browsers automatically accept cookies, but you can usually modify your browser setting to decline cookies if you prefer. Please note that if you choose to decline cookies, it.e.g., may affect the functionality of some parts of our Site or third-party sites you visit via our links. For more detailed information on how we use cookies and how you can manage your preferences, please visit our dedicated <NextLink href="/legal/cookie-settings" className="text-nozu-electric-blue hover:underline">Cookie Settings</NextLink> page.
 
 ### Data Retention
 
@@ -97,7 +92,7 @@ We retain non-personal data collected for analytical purposes for a period neces
 
 ### International Data Transfers
 
-As NozuDrones.co.uk primarily targets users within the UK, our primary data processing and storage are intended to remain within the UK or European Economic Area (EEA). However, some of our third-party service providers (e.e.g., Google Analytics) may operate globally. By using our Site, you acknowledge that your non-personal information may be transferred to, stored in, and processed in countries outside of your country of residence, including the United States, where data protection laws may differ from those in your jurisdiction. We ensure that any such transfers comply with applicable data protection laws and that adequate safeguards are in place (e.e.g., Standard Contractual Clauses).
+As NozuDrones.co.uk primarily targets users within the UK, our primary data processing and storage are intended to remain within the UK or European Economic Area (EEA). However, some of our third-party service providers (e.g., Google Analytics) may operate globally. By using our Site, you acknowledge that your non-personal information may be transferred to, stored in, and processed in countries outside of your country of residence, including the United States, where data protection laws may differ from those in your jurisdiction. We ensure that any such transfers comply with applicable data protection laws and that adequate safeguards are in place (e.g., Standard contractual Clauses).
 
 ### Children's Privacy
 
@@ -126,216 +121,229 @@ We may update our Privacy Policy from time to time to reflect changes in our pra
 
 If you have any questions or concerns about this Privacy Policy or our data practices, please do not hesitate to contact us:
 
-* **By Email:** [hello@nozudrones.co.uk](mailto://hello@nozudrones.co.uk)
+* **By Email:** [hello@nozudrones.co.uk](mailto://hello.nozudrones.co.uk)
 * **By Visiting this page on our website:** [Contact Us](https://www.nozudrones.co.uk/contact)
+
+**Last Updated: July 22, 2025**
 `;
 
-// Define the sections for the left-hand index - **CRITICALLY UPDATED IDs for link functionality**
+// Define the sections for the left-hand index - IDs must match generated markdown IDs
 const sections = [
-  { id: 'privacy-policy-for-nozudronescouk', title: 'Privacy Policy for NozuDrones.co.uk' }, // Corrected ID
-  { id: 'information-we-collect', title: 'Information We Collect' },
-  { id: 'non-personal-data', title: 'Non-Personal Data' },
-  { id: 'personal-data', title: 'Personal Data' },
-  { id: 'how-we-use-information', title: 'How We Use Information' },
-  { id: 'disclosure-of-your-information', title: 'Disclosure of Your Information' },
-  { id: 'security-of-your-information', title: 'Security of Your Information' },
-  { id: 'third-party-links--affiliate-disclosure', title: 'Third-Party Links & Affiliate Disclosure' },
-  { id: 'cookies-and-tracking-technologies', title: 'Cookies and Tracking Technologies' },
-  { id: 'data-retention', title: 'Data Retention' },
-  { id: 'international-data-transfers', title: 'International Data Transfers' },
-  { id: 'childrens-privacy', title: 'Children\'s Privacy' },
-  { id: 'your-rights-gdpr-and-uk-data-protection-act', title: 'Your Rights (GDPR and UK Data Protection Act)' },
-  { id: 'changes-to-this-privacy-policy', title: 'Changes to This Privacy Policy' },
-  { id: 'contact-us', title: 'Contact Us' },
+    { id: 'privacy-policy-for-nozudronescouk', title: 'Privacy Policy for NozuDrones.co.uk' },
+    { id: 'information-we-collect', title: 'Information We Collect' },
+    { id: 'how-we-use-information', title: 'How We Use Information' },
+    { id: 'disclosure-of-your-information', title: 'Disclosure of Your Information' },
+    { id: 'security-of-your-information', title: 'Security of Your Information' },
+    { id: 'third-party-links-affiliate-disclosure', title: 'Third-Party Links & Affiliate Disclosure' },
+    { id: 'cookies-and-tracking-technologies', title: 'Cookies and Tracking Technologies' },
+    { id: 'data-retention', title: 'Data Retention' },
+    { id: 'international-data-transfers', title: 'International Data Transfers' },
+    { id: 'childrens-privacy', title: 'Children\'s Privacy' },
+    { id: 'your-rights-gdpr-and-uk-data-protection-act', title: 'Your Rights (GDPR and UK Data Protection Act)' },
+    { id: 'changes-to-this-privacy-policy', title: 'Changes to This Privacy Policy' },
+    { id: 'contact-us', title: 'Contact Us' },
 ];
 
+// Helper function to slugify text for IDs - crucial for consistent ID generation
+const slugify = (text) => {
+    return text
+        .toString()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_-]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+};
+
 export default function PrivacyPolicyPage() {
-  const [activeSectionId, setActiveSectionId] = useState(''); // State to track the currently active section
-  const articleRef = useRef(null); // Ref for the main article content area
+    const headerHeightMobile = 43; // Your defined mobile header height
+    const headerHeightDesktop = 92; // Your defined desktop header height
+    const titleBarActualHeight = 68; // Your defined title bar height
 
-  // Define responsive top values for the sticky header (from HeaderWrapper)
-  const headerHeightMobile = 43;
-  const headerHeightDesktop = 92;
+    // Calculated heights for sticky elements
+    const combinedStickyHeightMobile = headerHeightMobile + titleBarActualHeight; // 43 + 68 = 111px
+    const combinedStickyHeightDesktop = headerHeightDesktop + titleBarActualHeight; // 92 + 68 = 160px
 
-  // Sticky title bar height
-  const titleBarActualHeight = 68;
+    const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
+    const searchParams = useSearchParams();
 
-  // Combined sticky heights for positioning
-  // These are now raw pixel values for direct use in calc()
-  const totalStickyHeightMobilePx = headerHeightMobile + titleBarActualHeight; // 111
-  const totalStickyHeightDesktopPx = headerHeightDesktop + titleBarActualHeight; // 160
+    // Ref for the new scrollable container
+    const mainContentRef = useRef(null);
 
-  // Function to handle scroll and determine active section
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!articleRef.current) return;
+    // Diagnostic Log: Current offset calculation - now logged on every click as well
+    // Note: This offset is for window scrolling, but we are now using a dedicated container.
+    // So, it's logged but not actively used for the new container scrolling.
+    const currentOffset = -(windowWidth < 768 ? combinedStickyHeightMobile : combinedStickyHeightDesktop);
+    console.log(`[PrivacyPolicyPage] currentOffset calculated as: ${currentOffset}px for windowWidth: ${windowWidth}px`);
 
-      // Get the scroll position relative to the top of the document
-      const scrollY = window.scrollY;
 
-      // Calculate the effective scroll position relative to the start of the article content
-      // We also account for the height of the sticky elements, so the "active" section
-      // is considered based on when it comes into view *below* the sticky bar.
-      const offsetForActiveDetection = headerHeightDesktop + titleBarActualHeight; // Use exact sticky height for detection
-      // console.log(`offsetForActiveDetection: ${offsetForActiveDetection}`); // Debugging
+    useEffect(() => {
+        console.log(`[PrivacyPolicyPage] Component Mounted. Initial window width: ${windowWidth}px`);
 
-      let currentActive = '';
-
-      // Iterate through sections to find the one in view
-      // Iterate in reverse to prioritize sections higher up when multiple are partially visible
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const section = sections[i];
-        const element = document.getElementById(section.id);
-
-        if (element) {
-          // Get the top position of the element relative to the document
-          // Use offsetTop for more reliable document-relative position
-          const elementTop = element.offsetTop;
-          // console.log(`Checking ID: ${section.id}, elementTop: ${elementTop}, scrollY + offsetForActiveDetection: ${scrollY + offsetForActiveDetection}`); // Debugging
-
-          // Check if the element's top is within the effective scroll area
-          // It should be considered active if its top is above or at the effectiveScrollTop
-          if (elementTop <= scrollY + offsetForActiveDetection) {
-            currentActive = section.id;
-            break; // Found the highest section in view, stop
-          }
+        // Register custom scroll container with react-scroll
+        if (mainContentRef.current) {
+            // Register 'begin' event for container-based scrolling
+            Events.scrollEvent.register('begin', function (to, element) {
+                console.log(`[react-scroll] Scroll Begin (in container): target='${to}' element=`, element);
+            });
+            Events.scrollEvent.register('end', function (to, element) {
+                console.log(`[react-scroll] Scroll End (in container): target='${to}' element=`, element);
+            });
+            console.log('[PrivacyPolicyPage] react-scroll events (begin/end) registered for container.');
+        } else {
+            console.warn('[PrivacyPolicyPage] mainContentRef.current is null. Scroll events for container not registered.');
         }
-      }
-      setActiveSectionId(currentActive);
-      console.log(`Scroll Debug: scrollY: ${scrollY}, effectiveScrollTop: ${scrollY + offsetForActiveDetection}, Active: ${currentActive}`); // Debugging log
-    };
 
-    // Attach scroll listener
-    window.addEventListener('scroll', handleScroll);
-    // Call once on mount to set initial active section
-    handleScroll();
+        const hash = window.location.hash;
+        if (hash) {
+            const targetId = hash.substring(1);
+            console.log(`[PrivacyPolicyPage] Initial hash detected: #${targetId}`);
 
-    // Cleanup listener on unmount
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [headerHeightDesktop, titleBarActualHeight]); // Re-run if sticky heights change
+            // Diagnostic Log: Scheduling initial scroll
+            const timer = setTimeout(() => {
+                const offset = 0; // No offset when scrolling within a dedicated container
+                console.log(`[PrivacyPolicyPage] Executing initial scroll to #${targetId} with offset: ${offset} in container.`);
+                if (mainContentRef.current) {
+                    scroller.scrollTo(targetId, {
+                        duration: 0,
+                        smooth: false,
+                        offset: offset,
+                        containerId: 'main-content-scroll-area', // Target the new scroll container
+                    });
+                } else {
+                    console.warn('[PrivacyPolicyPage] mainContentRef.current is null for initial scroll. Cannot scroll.');
+                }
+            }, 300);
 
-  // Custom scroll function to handle anchor links with sticky header offset
-  const scrollToSection = (id) => {
-    const element = document.getElementById(id);
-    if (element) {
-      console.log(`ScrollTo Debug: Element found for ID: ${id}`);
-      console.log(`Element Tag: ${element.tagName}, Element ID: ${element.id}`);
+            return () => clearTimeout(timer);
+        }
 
-      const offset = headerHeightDesktop + titleBarActualHeight; // 160px for desktop
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+            console.log(`[PrivacyPolicyPage] Window resized to: ${window.innerWidth}px`);
+        };
+        window.addEventListener('resize', handleResize);
 
-      // Calculate the target scroll position: element's position relative to viewport + current scroll position - sticky offset
-      const targetScrollPosition = element.getBoundingClientRect().top + window.scrollY - offset;
 
-      // Directly set scrollTop on the document's root element (<html>)
-      document.documentElement.scrollTop = targetScrollPosition;
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            Events.scrollEvent.remove('begin');
+            Events.scrollEvent.remove('end');
+            console.log('[PrivacyPolicyPage] Cleanup: Event listeners removed.');
+        };
+    }, [windowWidth, searchParams]); // Dependencies for useEffect.
 
-      console.log(`ScrollTo Debug: document.documentElement.scrollTop set for ID: ${id} to position: ${targetScrollPosition}`);
-    } else {
-      console.error(`ScrollTo Error: Element with ID "${id}" not found.`);
-    }
-  };
+    return (
+        <div className="font-sans antialiased bg-nozu-white text-nozu-dark-grey">
+            {/* Sticky Title Bar - Full width, sticks below HeaderWrapper */}
+            <div className={`sticky top-[${headerHeightMobile}px] md:top-[${headerHeightDesktop}px] w-full z-40 bg-nozu-dark-grey text-white py-4 px-6 md:px-10 lg:px-12 shadow-md`}>
+                <h1 className="text-3xl md:text-4xl font-extrabold text-center">Privacy Policy</h1>
+            </div>
 
-  return (
-    <div className="font-sans antialiased bg-nozu-white text-nozu-dark-grey">
-      {/* Sticky Title Bar - Full width, sticks below HeaderWrapper */}
-      <div className={`sticky top-[${headerHeightMobile}px] md:top-[${headerHeightDesktop}px] w-full z-40 bg-nozu-dark-grey text-white py-4 px-6 md:px-10 lg:px-12 shadow-md`}>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-center">Privacy Policy</h1>
-      </div>
+            {/* Main content area (sidebar + article) */}
+            {/* Added fixed height using actual pixel values for h-[calc(...)] for direct copy/paste */}
+            <div className={`flex flex-col md:flex-row mt-4 h-[calc(100vh-16px-43px-68px)] md:h-[calc(100vh-16px-92px-68px)]`}>
+                {/* Left Sidebar for Navigation */}
+                <aside className={`w-full md:w-1/4 lg:w-1/5 bg-nozu-white border-r border-nozu-light-grey sticky top-[${combinedStickyHeightMobile}px] md:top-[${combinedStickyHeightDesktop}px] overflow-y-auto z-30`}>
+                    <div className="px-6 md:px-10 py-8">
+                        <h2 className="text-2xl font-bold text-nozu-dark-grey mt-0 mb-6">Contents</h2>
+                        <nav>
+                            <ul className="space-y-3">
+                                {sections.map(section => (
+                                    <li key={section.id}>
+                                        <ScrollLink
+                                            to={section.id}
+                                            spy={true}
+                                            smooth={true}
+                                            duration={500}
+                                            // offset={0} // No offset when scrolling within a dedicated container
+                                            containerId="main-content-scroll-area" // IMPORTANT: Target the new scroll container
+                                            activeClass="active-section-link"
+                                            className="block text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200 text-lg contents-menu-item cursor-pointer"
+                                            onSetActive={(to) => console.log(`[ScrollLink] Active: ${to} in container`)}
+                                            onSetInactive={(to) => console.log(`[ScrollLink] Inactive: ${to} in container`)}
+                                            onClick={() => console.log(`[ScrollLink] Clicked: ${section.id}, targeting container: main-content-scroll-area`)}
+                                        >
+                                            {section.title}
+                                        </ScrollLink>
+                                    </li>
+                                ))}
+                            </ul>
+                        </nav>
+                    </div>
+                </aside>
 
-      {/* Main content area (sidebar + article) */}
-      {/* Removed h-[calc()] from this div. It should not be a scrolling container. */}
-      <div className="flex flex-col md:flex-row">
-        {/* Left Sidebar for Navigation */}
-        <aside className={`w-full md:w-1/4 lg:w-1/5 bg-nozu-white border-r border-nozu-light-grey sticky top-[${totalStickyHeightMobilePx}px] md:top-[${totalStickyHeightDesktopPx}px] md:max-h-[calc(100vh-${totalStickyHeightDesktopPx}px)] overflow-y-auto hide-scrollbar z-30`}>
-          {/* Inner div for padding */}
-          <div className="px-6 md:px-10 py-8">
-            <h2 className="text-2xl font-bold text-nozu-dark-grey mt-0 mb-6">Contents</h2>
-            <nav>
-              <ul className="space-y-3">
-                {sections.map(section => {
-                  console.log(`Menu Item Rendered: ID: ${section.id}, Title: ${section.title}`); // Debugging log for menu items
-                  return (
-                    <li key={section.id}>
-                      <a
-                        href={`#${section.id}`} // Keep href for fallback/SEO
-                        onClick={(e) => {
-                          e.preventDefault(); // Prevent default anchor link behavior
-                          scrollToSection(section.id);
-                        }}
-                        className={`block text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200 text-lg contents-menu-item ${activeSectionId === section.id ? 'active text-nozu-electric-blue font-semibold' : ''}`}
-                        style={{ paddingLeft: section.title.startsWith('###') ? '1.5rem' : section.title.startsWith('##') ? '0.75rem' : '0' }}
-                      >
-                        {section.title}
-                      </a>
-                    </li>
-                  );
-                })}
-              </ul>
-            </nav>
-          </div>
-        </aside>
-
-        {/* Main Content Area for Privacy Policy */}
-        {/* Removed mt-[...] from article. The content will now flow naturally. */}
-        <article ref={articleRef} className={`flex-grow max-w-4xl mx-auto md:mx-0 bg-nozu-white`}>
-          {/* Inner div for padding and prose styling */}
-          {/* Added pt-[...] to this inner div to push content below sticky elements */}
-          <div className={`prose prose-lg max-w-none text-nozu-dark-grey px-6 md:px-10 py-8 pt-[${totalStickyHeightMobilePx}px] md:pt-[${totalStickyHeightDesktopPx}px]`}>
-            <Markdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                h2: ({ node, ...props }) => {
-                  // Robust ID generation: Join all children to get full text, then process
-                  const textContent = React.Children.toArray(props.children).map(child =>
-                    typeof child === 'string' ? child : ''
-                  ).join('');
-
-                  const id = textContent.toLowerCase()
-                    .replace(/^\d+\.\s*/, '') // Remove leading numbers
-                    .replace(/\s/g, '-')      // Replace spaces with hyphens
-                    .replace(/\.co\.uk/g, 'couk') // Specific replacement for .co.uk
-                    .replace(/[^\w-]/g, '');  // Remove any other non-word/non-hyphen chars
-                  console.log(`Generated H2 ID: ${id} for text: "${textContent}"`); // Debugging log
-                  return <h2 id={id} className="text-2xl font-bold text-nozu-dark-grey mb-4" {...props} />;
-                },
-                h3: ({ node, ...props }) => {
-                  const textContent = React.Children.toArray(props.children).map(child =>
-                    typeof child === 'string' ? child : ''
-                  ).join('');
-                  const id = textContent.toLowerCase()
-                    .replace(/^\d+\.\s*/, '')
-                    .replace(/\s/g, '-')
-                    .replace(/\.co\.uk/g, 'couk')
-                    .replace(/[^\w-]/g, '');
-                  console.log(`Generated H3 ID: ${id} for text: "${textContent}"`); // Debugging log
-                  return <h3 id={id} className="text-xl font-semibold text-nozu-dark-grey mb-3 mt-6" {...props} />;
-                },
-                h4: ({ node, ...props }) => {
-                  const textContent = React.Children.toArray(props.children).map(child =>
-                    typeof child === 'string' ? child : ''
-                  ).join('');
-                  const id = textContent.toLowerCase()
-                    .replace(/^\d+\.\s*/, '')
-                    .replace(/\s/g, '-')
-                    .replace(/\.co\.uk/g, 'couk')
-                    .replace(/[^\w-]/g, '');
-                  console.log(`Generated H4 ID: ${id} for text: "${textContent}"`); // Debugging log
-                  return <h4 id={id} className="text-lg font-semibold text-nozu-dark-grey mb-2 mt-4" {...props} />;
-                },
-                p: ({ node, ...props }) => <p className="mb-4 leading-relaxed" {...props} />,
-                ul: ({ node, ...props }) => <ul className="list-disc mb-4 space-y-1" {...props} />,
-                ol: ({ node, ...props }) => <ol className="list-decimal mb-4 space-y-1" {...props} />,
-                a: ({ node, ...props }) => <a className="text-nozu-electric-blue hover:underline" {...props} />,
-                strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
-              }}
-            >
-              {privacyPolicyContent}
-            </Markdown>
-          </div>
-        </article>
-      </div>
-    </div>
-  );
+                {/* Main Content Area for Privacy Policy - NOW THE SCROLL CONTAINER */}
+                <div id="main-content-scroll-area" ref={mainContentRef} className={`flex-grow md:mx-0 bg-nozu-white overflow-y-auto`}>
+                    <article className={`max-w-4xl mx-auto prose prose-lg text-nozu-dark-grey px-6 md:px-10 py-8 pt-0`}>
+                        <Markdown
+                            components={{
+                                h2: ({ node, children, ...props }) => {
+                                    const textContent = Array.isArray(children) ? children.map(c => typeof c === 'string' ? c : c?.props?.value || c?.props?.children).join('') : (typeof children === 'string' ? children : '');
+                                    const id = slugify(textContent);
+                                    console.log(`[Markdown Render] Processing h2: text='${textContent}', id='${id}'`);
+                                    return (
+                                        <Element name={id} key={id} className="element" style={{ paddingTop: '0px', marginTop: '0' }}>
+                                            <h2 id={id} className={`text-2xl font-bold text-nozu-dark-grey mb-4`} {...props}>{children}</h2>
+                                        </Element>
+                                    );
+                                },
+                                h3: ({ node, children, ...props }) => {
+                                    const textContent = Array.isArray(children) ? children.map(c => typeof c === 'string' ? c : c?.props?.value || c?.props?.children).join('') : (typeof children === 'string' ? children : '');
+                                    const id = slugify(textContent);
+                                    console.log(`[Markdown Render] Processing h3: text='${textContent}', id='${id}'`);
+                                    return (
+                                        <Element name={id} key={id} className="element" style={{ paddingTop: '0px', marginTop: '0' }}>
+                                            <h3 id={id} className={`text-xl font-semibold text-nozu-dark-grey mb-3`} {...props}>{children}</h3>
+                                        </Element>
+                                    );
+                                },
+                                h4: ({ node, children, ...props }) => {
+                                    const textContent = Array.isArray(children) ? children.map(c => typeof c === 'string' ? c : c?.props?.value || c?.props?.children).join('') : (typeof children === 'string' ? children : '');
+                                    const id = slugify(textContent);
+                                    console.log(`[Markdown Render] Processing h4: text='${textContent}', id='${id}'`);
+                                    return (
+                                        <Element name={id} key={id} className="element" style={{ paddingTop: '0px', marginTop: '0' }}>
+                                            <h4 id={id} className={`text-lg font-semibold text-nozu-dark-grey mb-2`} {...props}>{children}</h4>
+                                        </Element>
+                                    );
+                                },
+                                p: ({ node, ...props }) => <p className="mb-4 leading-relaxed" {...props} />,
+                                ul: ({ node, ...props }) => <ul className="list-disc mb-4 space-y-1" {...props} />,
+                                ol: ({ node, ...props }) => <ol className="list-decimal mb-4 space-y-1" {...props} />,
+                                a: ({ node, ...props }) => {
+                                    if (props.href && (props.href.startsWith('http') || props.href.startsWith('mailto:'))) {
+                                        return <a className="text-nozu-electric-blue hover:underline" {...props} target="_blank" rel="noopener noreferrer" />;
+                                    }
+                                    if (props.href && props.href.startsWith('#')) {
+                                        const targetId = props.href.substring(1);
+                                        console.log(`[Markdown Render] Internal link: href='${props.href}', targetId='${targetId}'`);
+                                        return (
+                                            <ScrollLink
+                                                to={targetId}
+                                                spy={true}
+                                                smooth={true}
+                                                duration={500}
+                                                // offset={0} // No offset when scrolling within a dedicated container
+                                                containerId="main-content-scroll-area" // IMPORTANT: Target the new container
+                                                className="text-nozu-electric-blue hover:underline cursor-pointer"
+                                            >
+                                                {props.children}
+                                            </ScrollLink>
+                                        );
+                                    }
+                                    return <NextLink className="text-nozu-electric-blue hover:underline" {...props} />;
+                                },
+                                strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
+                            }}
+                        >
+                            {privacyPolicyContent}
+                        </Markdown>
+                    </article> {/* Corrected closing for article */}
+                </div> {/* Corrected closing for main-content-scroll-area div */}
+            </div>
+        </div>
+    );
 }

@@ -7,22 +7,32 @@
 
 /* Global body styles */
 html {
-  scroll-behavior: smooth; /* Added for smooth scrolling on anchor links */
+  /* Removed: scroll-behavior: smooth; as react-scroll handles it */
 }
+
+/*
+  Removed `scroll-margin-top` as react-scroll's JS offset handles this.
+  h2[id], h3[id], h4[id] {
+    scroll-margin-top: 192px;
+  }
+  @media (max-width: 767px) {
+    h2[id], h3[id], h4[id] {
+      scroll-margin-top: 143px;
+    }
+  }
+*/
 
 html,
 body {
   max-width: 100vw;
   overflow-x: hidden; /* Prevent horizontal scroll */
-  /* overflow-y: auto; is not needed here as min-h-screen on body in layout.jsx handles vertical scroll */
   height: 100%;       /* Ensure html takes full viewport height for sticky to work */
 }
 
 body {
-  /* Removed background-color here to allow page components to define their own backgrounds */
   color: theme('colors.nozu-dark-grey');
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  -moz-osx-moz-smoothing: grayscale;
 }
 
 /* Link reset */
@@ -33,27 +43,37 @@ a {
 
 /* Hide scrollbar for Webkit browsers (Chrome, Safari) */
 .hide-scrollbar::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
 /* Hide scrollbar for Firefox */
 .hide-scrollbar {
-    scrollbar-width: none; /* Firefox */
+  scrollbar-width: none; /* Firefox */
 }
 
+/* Styles for the contents menu items and the active state */
 .contents-menu-item {
   position: relative; /* Needed for ::before pseudo-element positioning */
   padding-left: 1.5rem; /* Make space for the indicator bar */
+  /* Ensure consistent height for list items, e.g., line-height or explicit height */
+  line-height: 1.5; /* Adjust as needed for your specific font-size */
+  display: block; /* Ensure it takes full width for padding/hover area */
 }
 
-.contents-menu-item.active::before {
+/* Renamed from .active to .active-section-link to match react-scroll's activeClass prop */
+.active-section-link {
+  color: theme('colors.nozu-electric-blue'); /* Example: a blue highlight for active link */
+  font-weight: bold; /* Make it bold */
+}
+
+.active-section-link::before {
   content: '';
   position: absolute;
-  left: -4px; /* Adjusted to move left by a few pixels */
+  left: 0px; /* Adjusted to be at the very left edge of the padding */
   top: 50%; /* Vertically center the bar */
   transform: translateY(-50%);
   width: 4px; /* Thickness of the bar */
   height: 80%; /* Height of the bar relative to the list item */
-  background-color: hsl(217, 7%, 52%); /* Changed to nozu-medium-grey HSL value */
+  background-color: theme('colors.nozu-electric-blue'); /* Example: using electric blue for active indicator */
   border-radius: 2px; /* Slightly rounded ends */
 }

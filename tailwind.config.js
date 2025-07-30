@@ -114,16 +114,20 @@ module.exports = {
     // Desktop: 100vh - 160px
     'md:h-[calc(100vh-160px)]',
 
-    // Margin-top for article (to push content below sticky elements)
+    // Padding-top for main article content (to push content below sticky elements)
     // Mobile: 111px
-    'mt-[111px]',
+    'pt-[111px]', // ADDED THIS
     // Desktop: 160px
-    'md:mt-[160px]',
+    'md:pt-[160px]', // ADDED THIS
 
     // Max-height for sidebar (to allow internal scrolling if menu is too long)
     // Mobile: 100vh - 111px (same as parent div height)
     'max-h-[calc(100vh-111px)]',
     // Desktop: 100vh - 160px (same as parent div height)
     'md:max-h-[calc(100vh-160px)]',
+
+    // Also remove the old mt-[...] if not actually used on the article div
+    // 'mt-[111px]', // Removed this as it was not used for the article content padding
+    // 'md:mt-[160px]', // Removed this as it was not used for the article content padding
   ],
 };
