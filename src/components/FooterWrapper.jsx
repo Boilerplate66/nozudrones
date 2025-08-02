@@ -1,4 +1,5 @@
-// src/components/FooterWrapper.jsx
+/* src/components/FooterWrapper.jsx */
+
 // This component is a Server Component as it has no client-side interactivity
 
 import React from 'react';
@@ -56,6 +57,7 @@ export default function FooterWrapper() {
               <li><Link href="/contact" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">Contact Us</Link></li>
               <li><Link href="/faq" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">FAQ</Link></li>
               <li><Link href="/downloads" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">Warranty & Repair</Link></li>
+              <li><Link href="/about/sitemap" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">Sitemap</Link></li>
             </ul>
           </div>
 
@@ -63,10 +65,9 @@ export default function FooterWrapper() {
           <div>
             <ul className="space-y-2">
               <li><Link href="/legal/privacy-policy" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">Terms of Service</Link></li>
-              <li><Link href="/cookies" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">Cookie Settings</Link></li>
-              <li><Link href="/disclaimer" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">Disclaimer</Link></li>
-              <li><Link href="/sitemap.xml" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">Sitemap</Link></li>
+              <li><Link href="/legal/terms-of-service" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">Terms of Service</Link></li>
+              <li><Link href="/legal/cookies" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">Cookie Settings</Link></li>
+              <li><Link href="/legal/disclaimer" className="text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200">Disclaimer</Link></li>
             </ul>
           </div>
 

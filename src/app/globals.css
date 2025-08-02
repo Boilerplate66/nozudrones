@@ -6,74 +6,82 @@
 @tailwind utilities;
 
 /* Global body styles */
-html {
-  /* Removed: scroll-behavior: smooth; as react-scroll handles it */
-}
-
-/*
-  Removed `scroll-margin-top` as react-scroll's JS offset handles this.
-  h2[id], h3[id], h4[id] {
-    scroll-margin-top: 192px;
-  }
-  @media (max-width: 767px) {
-    h2[id], h3[id], h4[id] {
-      scroll-margin-top: 143px;
-    }
-  }
-*/
-
 html,
 body {
-  max-width: 100vw;
-  overflow-x: hidden; /* Prevent horizontal scroll */
-  height: 100%;       /* Ensure html takes full viewport height for sticky to work */
+    max-width: 100vw;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+    height: 100%;      /* Ensure html takes full viewport height for sticky to work */
 }
 
 body {
-  color: theme('colors.nozu-dark-grey');
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-moz-smoothing: grayscale;
+    color: theme('colors.nozu-dark-grey');
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-moz-smoothing: grayscale;
 }
 
 /* Link reset */
 a {
-  color: inherit;
-  text-decoration: none;
+    color: inherit;
+    text-decoration: none;
 }
 
 /* Hide scrollbar for Webkit browsers (Chrome, Safari) */
 .hide-scrollbar::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 
 /* Hide scrollbar for Firefox */
 .hide-scrollbar {
-  scrollbar-width: none; /* Firefox */
+    scrollbar-width: none; /* Firefox */
 }
 
 /* Styles for the contents menu items and the active state */
 .contents-menu-item {
-  position: relative; /* Needed for ::before pseudo-element positioning */
-  padding-left: 1.5rem; /* Make space for the indicator bar */
-  /* Ensure consistent height for list items, e.g., line-height or explicit height */
-  line-height: 1.5; /* Adjust as needed for your specific font-size */
-  display: block; /* Ensure it takes full width for padding/hover area */
+    position: relative; /* Needed for ::before pseudo-element positioning */
+    padding-left: 1.5rem; /* Make space for the indicator bar */
+    line-height: 1.5; /* Adjust as needed for your specific font-size */
+    display: block; /* Ensure it takes full width for padding/hover area */
 }
 
-/* Renamed from .active to .active-section-link to match react-scroll's activeClass prop */
+/* Subtler active state */
 .active-section-link {
-  color: theme('colors.nozu-electric-blue'); /* Example: a blue highlight for active link */
-  font-weight: bold; /* Make it bold */
+    color: theme('colors.nozu-electric-blue');
+    font-weight: 500; /* Medium font weight, less bold */
 }
 
 .active-section-link::before {
-  content: '';
-  position: absolute;
-  left: 0px; /* Adjusted to be at the very left edge of the padding */
-  top: 50%; /* Vertically center the bar */
-  transform: translateY(-50%);
-  width: 4px; /* Thickness of the bar */
-  height: 80%; /* Height of the bar relative to the list item */
-  background-color: theme('colors.nozu-electric-blue'); /* Example: using electric blue for active indicator */
-  border-radius: 2px; /* Slightly rounded ends */
+    content: '';
+    position: absolute;
+    left: 0px; /* Adjusted to be at the very left edge of the padding */
+    top: 50%; /* Vertically center the bar */
+    transform: translateY(-50%);
+    width: 4px; /* Thickness of the bar */
+    height: 80%; /* Height of the bar relative to the list item */
+    background-color: theme('colors.nozu-electric-blue'); /* Example: using electric blue for active indicator */
+    border-radius: 2px; /* Slightly rounded ends */
+}
+
+/* Hover state remains a separate color change */
+.contents-menu-item:hover {
+    color: theme('colors.nozu-electric-blue');
+    font-weight: 500;
+}
+/* ensure all headings respect the dynamic header offset */
+.prose h2,
+.prose h3,
+.prose h4 {
+    scroll-margin-top: var(--header-offset, 80px);
+}
+
+/* ---- New CSS for mobile layout ---- */
+
+/* Hides the sidebar completely on mobile and sets it to stick to the top on larger screens */
+.nozu-mobile-sidebar-container {
+    display: none; /* Default to hidden on mobile */
+}
+
+@media (min-width: 768px) {
+    .nozu-mobile-sidebar-container {
+        display: block; /* Show as a block on medium screens and up */
+    }
 }

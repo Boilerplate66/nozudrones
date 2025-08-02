@@ -1,13 +1,12 @@
-// src/app/legal/privacy-policy/page.jsx
-"use client"; // This directive marks the component as a Client Component
+/* src/app/legal/privacy-policy/page.jsx */
 
-import React, { useEffect, useState, useRef } from 'react';
+"use client";
+
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Markdown from 'react-markdown';
-import { Link as ScrollLink, Element, Events, scroller } from 'react-scroll';
 import NextLink from 'next/link';
-import { useSearchParams } from 'next/navigation';
 
-// Import your Privacy Policy content directly as a string
+// Privacy Policy content (unchanged)
 const privacyPolicyContent = `
 ### Privacy Policy for NozuDrones.co.uk
 
@@ -106,8 +105,8 @@ As a website operating within the UK and adhering to the General Data Protection
 * **The Right of Access:** To request a copy of the non-personal data we hold about you.
 * **The Right to Rectification:** To request correction of any inaccurate or incomplete data.
 * **The Right to Erasure ("Right to Be Forgotten"):** To request the deletion of your data, under certain conditions.
-* **The Right to Restrict Processing:** To request that we limit the way we use your data, under certain conditions.
-* **The Right to Data Portability:** To request that we transfer the data we have collected to another organization, or directly to you, under certain conditions.
+* **The Right to Restrict Processing:** To request that you limit the way we use your data, under certain conditions.
+* **The Right to Data Portability:** To request that you transfer the data we have collected to another organization, or directly to you, under certain conditions.
 * **The Right to Object:** To object to our processing of your data, under certain conditions.
 * **Rights in Relation to Automated Decision Making and Profiling:** We do not engage in automated decision-making or profiling that produces legal effects concerning you.
 
@@ -127,24 +126,24 @@ If you have any questions or concerns about this Privacy Policy or our data prac
 **Last Updated: July 22, 2025**
 `;
 
-// Define the sections for the left-hand index - IDs must match generated markdown IDs
-const sections = [
-    { id: 'privacy-policy-for-nozudronescouk', title: 'Privacy Policy for NozuDrones.co.uk' },
-    { id: 'information-we-collect', title: 'Information We Collect' },
-    { id: 'how-we-use-information', title: 'How We Use Information' },
-    { id: 'disclosure-of-your-information', title: 'Disclosure of Your Information' },
-    { id: 'security-of-your-information', title: 'Security of Your Information' },
-    { id: 'third-party-links-affiliate-disclosure', title: 'Third-Party Links & Affiliate Disclosure' },
-    { id: 'cookies-and-tracking-technologies', title: 'Cookies and Tracking Technologies' },
-    { id: 'data-retention', title: 'Data Retention' },
-    { id: 'international-data-transfers', title: 'International Data Transfers' },
-    { id: 'childrens-privacy', title: 'Children\'s Privacy' },
-    { id: 'your-rights-gdpr-and-uk-data-protection-act', title: 'Your Rights (GDPR and UK Data Protection Act)' },
-    { id: 'changes-to-this-privacy-policy', title: 'Changes to This Privacy Policy' },
-    { id: 'contact-us', title: 'Contact Us' },
+// Titles in canonical order; IDs are generated via slugify to keep in sync
+const sectionTitles = [
+    'Privacy Policy for NozuDrones.co.uk',
+    'Information We Collect',
+    'How We Use Information',
+    'Disclosure of Your Information',
+    'Security of Your Information',
+    'Third-Party Links & Affiliate Disclosure',
+    'Cookies and Tracking Technologies',
+    'Data Retention',
+    'International Data Transfers',
+    "Children's Privacy",
+    'Your Rights (GDPR and UK Data Protection Act)',
+    'Changes to This Privacy Policy',
+    'Contact Us',
 ];
 
-// Helper function to slugify text for IDs - crucial for consistent ID generation
+// Slugify helper (same logic as headings)
 const slugify = (text) => {
     return text
         .toString()
@@ -157,117 +156,205 @@ const slugify = (text) => {
         .replace(/^-+|-+$/g, '');
 };
 
+// Build sections array programmatically so sidebar and observed IDs can't drift
+const sections = sectionTitles.map(title => ({ title, id: slugify(title) }));
+
 export default function PrivacyPolicyPage() {
-    const headerHeightMobile = 43; // Your defined mobile header height
-    const headerHeightDesktop = 92; // Your defined desktop header height
-    const titleBarActualHeight = 68; // Your defined title bar height
-
-    // Calculated heights for sticky elements
-    const combinedStickyHeightMobile = headerHeightMobile + titleBarActualHeight; // 43 + 68 = 111px
-    const combinedStickyHeightDesktop = headerHeightDesktop + titleBarActualHeight; // 92 + 68 = 160px
-
-    const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
-    const searchParams = useSearchParams();
-
-    // Ref for the new scrollable container
+    const titleBarRef = useRef(null);
     const mainContentRef = useRef(null);
+    const sidebarRef = useRef(null);
+    const [headerOffset, setHeaderOffset] = useState(0);
+    const [sidebarContentOffset, setSidebarContentOffset] = useState(0);
+    const [activeSection, setActiveSection] = useState(sections[0].id);
+    const observer = useRef(null);
+    const hashHandledRef = useRef(false);
 
-    // Diagnostic Log: Current offset calculation - now logged on every click as well
-    // Note: This offset is for window scrolling, but we are now using a dedicated container.
-    // So, it's logged but not actively used for the new container scrolling.
-    const currentOffset = -(windowWidth < 768 ? combinedStickyHeightMobile : combinedStickyHeightDesktop);
-    console.log(`[PrivacyPolicyPage] currentOffset calculated as: ${currentOffset}px for windowWidth: ${windowWidth}px`);
+    // Prevent native jump flicker if there's a hash (suppress smooth temporarily)
+    if (typeof window !== 'undefined' && window.location.hash) {
+        document.documentElement.style.scrollBehavior = 'auto';
+    }
 
-
+    // Setup scroll restoration override + header offset + initial reset
     useEffect(() => {
-        console.log(`[PrivacyPolicyPage] Component Mounted. Initial window width: ${windowWidth}px`);
-
-        // Register custom scroll container with react-scroll
-        if (mainContentRef.current) {
-            // Register 'begin' event for container-based scrolling
-            Events.scrollEvent.register('begin', function (to, element) {
-                console.log(`[react-scroll] Scroll Begin (in container): target='${to}' element=`, element);
-            });
-            Events.scrollEvent.register('end', function (to, element) {
-                console.log(`[react-scroll] Scroll End (in container): target='${to}' element=`, element);
-            });
-            console.log('[PrivacyPolicyPage] react-scroll events (begin/end) registered for container.');
-        } else {
-            console.warn('[PrivacyPolicyPage] mainContentRef.current is null. Scroll events for container not registered.');
+        if (typeof history !== 'undefined' && 'scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
         }
 
-        const hash = window.location.hash;
+        if (mainContentRef.current) {
+            mainContentRef.current.scrollTo(0, 0);
+        }
+
+        const updateOffsets = () => {
+            if (titleBarRef.current && mainContentRef.current && sidebarRef.current) {
+                const titleBarHeight = titleBarRef.current.offsetHeight;
+                setHeaderOffset(titleBarHeight + 16);
+                
+                // Calculate the offset from the top of the sidebar to the "Contents" title
+                // This accounts for the sidebar padding and the "Contents" title position
+                const sidebarPadding = 32; // py-8 = 2rem = 32px
+                const contentsTitle = sidebarRef.current.querySelector('h2');
+                const contentsTitleHeight = contentsTitle ? contentsTitle.offsetHeight + 24 : 56; // mb-6 = 24px
+                setSidebarContentOffset(sidebarPadding + contentsTitleHeight);
+                
+                mainContentRef.current.style.setProperty('--header-offset', `${titleBarHeight + 4}px`);
+            }
+        };
+
+        updateOffsets();
+        window.addEventListener('resize', updateOffsets);
+        return () => window.removeEventListener('resize', updateOffsets);
+    }, []);
+
+    // Handle incoming hash once offsets are known
+    useEffect(() => {
+        if (headerOffset === 0 || sidebarContentOffset === 0 || hashHandledRef.current) return;
+        if (!mainContentRef.current) return;
+
+        const hash = typeof window !== 'undefined' ? window.location.hash : '';
         if (hash) {
             const targetId = hash.substring(1);
-            console.log(`[PrivacyPolicyPage] Initial hash detected: #${targetId}`);
+            const el = document.getElementById(targetId);
+            if (el) {
+                // Use the sidebar content offset to align with the "Contents" title level
+                const scrollPosition = el.offsetTop - sidebarContentOffset;
+                mainContentRef.current.scrollTo({ top: scrollPosition, behavior: 'auto' });
+                setActiveSection(targetId);
+            }
+        }
+        // restore default behavior styling (optional)
+        document.documentElement.style.removeProperty('scroll-behavior');
+        hashHandledRef.current = true;
+    }, [headerOffset, sidebarContentOffset]);
 
-            // Diagnostic Log: Scheduling initial scroll
-            const timer = setTimeout(() => {
-                const offset = 0; // No offset when scrolling within a dedicated container
-                console.log(`[PrivacyPolicyPage] Executing initial scroll to #${targetId} with offset: ${offset} in container.`);
-                if (mainContentRef.current) {
-                    scroller.scrollTo(targetId, {
-                        duration: 0,
-                        smooth: false,
-                        offset: offset,
-                        containerId: 'main-content-scroll-area', // Target the new scroll container
-                    });
-                } else {
-                    console.warn('[PrivacyPolicyPage] mainContentRef.current is null for initial scroll. Cannot scroll.');
-                }
-            }, 300);
+    // Scrollspy logic with sentinel override and closest-to-header selection
+    useEffect(() => {
+        if (!mainContentRef.current || headerOffset === 0 || sidebarContentOffset === 0) return;
 
-            return () => clearTimeout(timer);
+        if (observer.current) {
+            observer.current.disconnect();
+            observer.current = null;
         }
 
-        const handleResize = () => {
-            setWindowWidth(window.innerWidth);
-            console.log(`[PrivacyPolicyPage] Window resized to: ${window.innerWidth}px`);
-        };
-        window.addEventListener('resize', handleResize);
+        const visibleEntries = new Map();
 
+        const callback = (entries) => {
+            // 1. Bottom sentinel override
+            const sentinel = mainContentRef.current.querySelector('#scroll-end-sentinel');
+            if (sentinel) {
+                const sentinelRect = sentinel.getBoundingClientRect();
+                const containerRect = mainContentRef.current.getBoundingClientRect();
+                if (sentinelRect.top >= containerRect.top && sentinelRect.bottom <= containerRect.bottom + 1) {
+                    const lastSectionId = sections[sections.length - 1].id;
+                    if (lastSectionId !== activeSection) {
+                        setActiveSection(lastSectionId);
+                    }
+                    return;
+                }
+            }
+
+            // 2. Normal intersection logic
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    visibleEntries.set(entry.target.id, entry);
+                } else {
+                    visibleEntries.delete(entry.target.id);
+                }
+            });
+
+            if (visibleEntries.size === 0) return;
+
+            let bestId = null;
+            let smallestDistance = Infinity;
+            visibleEntries.forEach((entry, id) => {
+                const distance = Math.abs(entry.boundingClientRect.top - sidebarContentOffset);
+                if (distance < smallestDistance) {
+                    smallestDistance = distance;
+                    bestId = id;
+                }
+            });
+
+            if (bestId && bestId !== activeSection) {
+                setActiveSection(bestId);
+            }
+        };
+
+        observer.current = new IntersectionObserver(callback, {
+            root: mainContentRef.current,
+            rootMargin: `-${sidebarContentOffset}px 0px -50% 0px`,
+            threshold: [0, 0.1, 0.5],
+        });
+
+        sections.forEach(({ id }) => {
+            const el = mainContentRef.current.querySelector(`#${id}`);
+            if (el) {
+                observer.current.observe(el);
+            } else if (process.env.NODE_ENV !== 'production') {
+                console.warn(`Scrollspy: expected section with id "${id}" not found in DOM`);
+            }
+        });
+
+        // Also observe the sentinel if present (so callback gets triggered when it enters)
+        const sentinelEl = mainContentRef.current.querySelector('#scroll-end-sentinel');
+        if (sentinelEl && observer.current) {
+            observer.current.observe(sentinelEl);
+        }
 
         return () => {
-            window.removeEventListener('resize', handleResize);
-            Events.scrollEvent.remove('begin');
-            Events.scrollEvent.remove('end');
-            console.log('[PrivacyPolicyPage] Cleanup: Event listeners removed.');
+            if (observer.current) observer.current.disconnect();
         };
-    }, [windowWidth, searchParams]); // Dependencies for useEffect.
+    }, [headerOffset, sidebarContentOffset, activeSection]);
+
+    const scrollToSection = (id) => {
+        setActiveSection(id);
+        const element = document.getElementById(id);
+        if (element && mainContentRef.current) {
+            // Use the sidebar content offset to align consistently
+            const scrollPosition = element.offsetTop - sidebarContentOffset;
+            mainContentRef.current.scrollTo({
+                top: scrollPosition,
+                behavior: 'smooth',
+            });
+            // update URL without triggering native jump
+            if (typeof history !== 'undefined') {
+                history.replaceState(null, '', `#${id}`);
+            }
+        }
+    };
 
     return (
         <div className="font-sans antialiased bg-nozu-white text-nozu-dark-grey">
-            {/* Sticky Title Bar - Full width, sticks below HeaderWrapper */}
-            <div className={`sticky top-[${headerHeightMobile}px] md:top-[${headerHeightDesktop}px] w-full z-40 bg-nozu-dark-grey text-white py-4 px-6 md:px-10 lg:px-12 shadow-md`}>
+            {/* Sticky Title Bar */}
+            <div
+                ref={titleBarRef}
+                className="sticky top-[43px] md:top-[92px] w-full z-40 bg-nozu-dark-grey text-white py-4 px-6 md:px-10 lg:px-12 shadow-md"
+            >
                 <h1 className="text-3xl md:text-4xl font-extrabold text-center">Privacy Policy</h1>
             </div>
 
-            {/* Main content area (sidebar + article) */}
-            {/* Added fixed height using actual pixel values for h-[calc(...)] for direct copy/paste */}
-            <div className={`flex flex-col md:flex-row mt-4 h-[calc(100vh-16px-43px-68px)] md:h-[calc(100vh-16px-92px-68px)]`}>
-                {/* Left Sidebar for Navigation */}
-                <aside className={`w-full md:w-1/4 lg:w-1/5 bg-nozu-white border-r border-nozu-light-grey sticky top-[${combinedStickyHeightMobile}px] md:top-[${combinedStickyHeightDesktop}px] overflow-y-auto z-30`}>
+            <div className="flex flex-col md:flex-row h-[calc(100vh-137px)] md:h-[calc(100vh-190px)]">
+                {/* Hide the sidebar on mobile, show on medium and up */}
+                <aside 
+                    ref={sidebarRef}
+                    className="hidden md:block w-full md:w-1/4 lg:w-1/5 bg-nozu-white border-r border-nozu-light-grey sticky top-0 z-30"
+                >
                     <div className="px-6 md:px-10 py-8">
                         <h2 className="text-2xl font-bold text-nozu-dark-grey mt-0 mb-6">Contents</h2>
-                        <nav>
+                        <nav aria-label="Privacy policy contents">
                             <ul className="space-y-3">
                                 {sections.map(section => (
                                     <li key={section.id}>
-                                        <ScrollLink
-                                            to={section.id}
-                                            spy={true}
-                                            smooth={true}
-                                            duration={500}
-                                            // offset={0} // No offset when scrolling within a dedicated container
-                                            containerId="main-content-scroll-area" // IMPORTANT: Target the new scroll container
-                                            activeClass="active-section-link"
-                                            className="block text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200 text-lg contents-menu-item cursor-pointer"
-                                            onSetActive={(to) => console.log(`[ScrollLink] Active: ${to} in container`)}
-                                            onSetInactive={(to) => console.log(`[ScrollLink] Inactive: ${to} in container`)}
-                                            onClick={() => console.log(`[ScrollLink] Clicked: ${section.id}, targeting container: main-content-scroll-area`)}
+                                        <a
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                scrollToSection(section.id);
+                                            }}
+                                            aria-current={activeSection === section.id ? 'location' : undefined}
+                                            className={`block text-nozu-medium-grey hover:text-nozu-electric-blue transition-colors duration-200 text-lg contents-menu-item cursor-pointer ${
+                                                activeSection === section.id ? 'active-section-link' : ''
+                                            }`}
                                         >
                                             {section.title}
-                                        </ScrollLink>
+                                        </a>
                                     </li>
                                 ))}
                             </ul>
@@ -275,74 +362,133 @@ export default function PrivacyPolicyPage() {
                     </div>
                 </aside>
 
-                {/* Main Content Area for Privacy Policy - NOW THE SCROLL CONTAINER */}
-                <div id="main-content-scroll-area" ref={mainContentRef} className={`flex-grow md:mx-0 bg-nozu-white overflow-y-auto`}>
-                    <article className={`max-w-4xl mx-auto prose prose-lg text-nozu-dark-grey px-6 md:px-10 py-8 pt-0`}>
+                <div
+                    id="main-content-scroll-area"
+                    ref={mainContentRef}
+                    className="flex-grow md:mx-0 bg-nozu-white overflow-y-auto"
+                >
+                    <article className="relative max-w-4xl mx-auto prose prose-lg text-nozu-dark-grey px-6 md:px-10 py-8">
                         <Markdown
                             components={{
                                 h2: ({ node, children, ...props }) => {
-                                    const textContent = Array.isArray(children) ? children.map(c => typeof c === 'string' ? c : c?.props?.value || c?.props?.children).join('') : (typeof children === 'string' ? children : '');
+                                    const textContent = Array.isArray(children)
+                                        ? children
+                                              .map(c =>
+                                                  typeof c === 'string'
+                                                      ? c
+                                                      : c?.props?.value || c?.props?.children
+                                              )
+                                              .join('')
+                                        : typeof children === 'string'
+                                        ? children
+                                        : '';
                                     const id = slugify(textContent);
-                                    console.log(`[Markdown Render] Processing h2: text='${textContent}', id='${id}'`);
                                     return (
-                                        <Element name={id} key={id} className="element" style={{ paddingTop: '0px', marginTop: '0' }}>
-                                            <h2 id={id} className={`text-2xl font-bold text-nozu-dark-grey mb-4`} {...props}>{children}</h2>
-                                        </Element>
+                                        <h2
+                                            id={id}
+                                            className="text-2xl font-bold text-nozu-dark-grey mb-4"
+                                            {...props}
+                                        >
+                                            {children}
+                                        </h2>
                                     );
                                 },
                                 h3: ({ node, children, ...props }) => {
-                                    const textContent = Array.isArray(children) ? children.map(c => typeof c === 'string' ? c : c?.props?.value || c?.props?.children).join('') : (typeof children === 'string' ? children : '');
+                                    const textContent = Array.isArray(children)
+                                        ? children
+                                              .map(c =>
+                                                  typeof c === 'string'
+                                                      ? c
+                                                      : c?.props?.value || c?.props?.children
+                                              )
+                                              .join('')
+                                        : typeof children === 'string'
+                                        ? children
+                                        : '';
                                     const id = slugify(textContent);
-                                    console.log(`[Markdown Render] Processing h3: text='${textContent}', id='${id}'`);
                                     return (
-                                        <Element name={id} key={id} className="element" style={{ paddingTop: '0px', marginTop: '0' }}>
-                                            <h3 id={id} className={`text-xl font-semibold text-nozu-dark-grey mb-3`} {...props}>{children}</h3>
-                                        </Element>
+                                        <h3
+                                            id={id}
+                                            className="text-xl font-semibold text-nozu-dark-grey mb-3"
+                                            {...props}
+                                        >
+                                            {children}
+                                        </h3>
                                     );
                                 },
                                 h4: ({ node, children, ...props }) => {
-                                    const textContent = Array.isArray(children) ? children.map(c => typeof c === 'string' ? c : c?.props?.value || c?.props?.children).join('') : (typeof children === 'string' ? children : '');
+                                    const textContent = Array.isArray(children)
+                                        ? children
+                                              .map(c =>
+                                                  typeof c === 'string'
+                                                      ? c
+                                                      : c?.props?.value || c?.props?.children
+                                              )
+                                              .join('')
+                                        : typeof children === 'string'
+                                        ? children
+                                        : '';
                                     const id = slugify(textContent);
-                                    console.log(`[Markdown Render] Processing h4: text='${textContent}', id='${id}'`);
                                     return (
-                                        <Element name={id} key={id} className="element" style={{ paddingTop: '0px', marginTop: '0' }}>
-                                            <h4 id={id} className={`text-lg font-semibold text-nozu-dark-grey mb-2`} {...props}>{children}</h4>
-                                        </Element>
+                                        <h4
+                                            id={id}
+                                            className="text-lg font-semibold text-nozu-dark-grey mb-2"
+                                            {...props}
+                                        >
+                                            {children}
+                                        </h4>
                                     );
                                 },
                                 p: ({ node, ...props }) => <p className="mb-4 leading-relaxed" {...props} />,
-                                ul: ({ node, ...props }) => <ul className="list-disc mb-4 space-y-1" {...props} />,
-                                ol: ({ node, ...props }) => <ol className="list-decimal mb-4 space-y-1" {...props} />,
-                                a: ({ node, ...props }) => {
+                                ul: ({ node, ...props }) => (
+                                    <ul className="list-disc mb-4 space-y-1" {...props} />
+                                ),
+                                ol: ({ node, ...props }) => (
+                                    <ol className="list-decimal mb-4 space-y-1" {...props} />
+                                ),
+                                a: ({ node, children, ...props }) => {
                                     if (props.href && (props.href.startsWith('http') || props.href.startsWith('mailto:'))) {
-                                        return <a className="text-nozu-electric-blue hover:underline" {...props} target="_blank" rel="noopener noreferrer" />;
+                                        return (
+                                            <a
+                                                className="text-nozu-electric-blue hover:underline"
+                                                {...props}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                {children}
+                                            </a>
+                                        );
                                     }
                                     if (props.href && props.href.startsWith('#')) {
                                         const targetId = props.href.substring(1);
-                                        console.log(`[Markdown Render] Internal link: href='${props.href}', targetId='${targetId}'`);
                                         return (
-                                            <ScrollLink
-                                                to={targetId}
-                                                spy={true}
-                                                smooth={true}
-                                                duration={500}
-                                                // offset={0} // No offset when scrolling within a dedicated container
-                                                containerId="main-content-scroll-area" // IMPORTANT: Target the new container
+                                            <a
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    scrollToSection(targetId);
+                                                }}
                                                 className="text-nozu-electric-blue hover:underline cursor-pointer"
                                             >
-                                                {props.children}
-                                            </ScrollLink>
+                                                {children}
+                                            </a>
                                         );
                                     }
-                                    return <NextLink className="text-nozu-electric-blue hover:underline" {...props} />;
+                                    return (
+                                        <NextLink className="text-nozu-electric-blue hover:underline" {...props}>
+                                            {children}
+                                        </NextLink>
+                                    );
                                 },
                                 strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
                             }}
                         >
                             {privacyPolicyContent}
                         </Markdown>
-                    </article> {/* Corrected closing for article */}
-                </div> {/* Corrected closing for main-content-scroll-area div */}
+
+                        {/* sentinel to detect bottom-of-scroll for last section */}
+                        <div id="scroll-end-sentinel" style={{ position: 'absolute', bottom: 0, height: 1, width: '100%' }} />
+                    </article>
+                </div>
             </div>
         </div>
     );
