@@ -5,6 +5,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Adjust scroll position for sticky headers */
+html {
+  scroll-padding-top: 111px; /* Mobile header height */
+}
+
+@media (min-width: 768px) {
+  html {
+    scroll-padding-top: 160px; /* Desktop header height */
+  }
+}
+
 /* Global body styles */
 html,
 body {

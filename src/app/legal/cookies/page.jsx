@@ -92,20 +92,42 @@ export default function CookieSettingsPage() {
     const [activeSection, setActiveSection] = useState(sections[0].id);
     const observer = useRef(null);
     const hashHandledRef = useRef(false);
+    const initialScrollHandledRef = useRef(false);
 
-    if (typeof window !== 'undefined' && window.location.hash) {
-        document.documentElement.style.scrollBehavior = 'auto';
-    }
-
+    // Set scroll restoration to manual as early as possible
     useEffect(() => {
-        if (typeof history !== 'undefined' && 'scrollRestoration' in history) {
+        // Disable browser scroll restoration immediately
+        if (typeof window !== 'undefined' && 'scrollRestoration' in history) {
             history.scrollRestoration = 'manual';
         }
-
-        if (mainContentRef.current) {
-            mainContentRef.current.scrollTo(0, 0);
+        
+        // Also disable smooth scroll behavior initially to prevent issues
+        if (typeof window !== 'undefined') {
+            document.documentElement.style.scrollBehavior = 'auto';
         }
+    }, []);
 
+    // Handle initial scroll position - this runs once on mount
+    useEffect(() => {
+        if (initialScrollHandledRef.current) return;
+        
+        // Force scroll to top on initial load if no hash
+        if (typeof window !== 'undefined') {
+            const hash = window.location.hash;
+            if (!hash) {
+                // Scroll main document to top
+                window.scrollTo(0, 0);
+                // Also scroll the main content area to top if it exists
+                if (mainContentRef.current) {
+                    mainContentRef.current.scrollTo(0, 0);
+                }
+            }
+        }
+        
+        initialScrollHandledRef.current = true;
+    }, []);
+
+    useEffect(() => {
         const updateOffsets = () => {
             if (titleBarRef.current && mainContentRef.current && sidebarRef.current) {
                 const titleBarHeight = titleBarRef.current.offsetHeight;
@@ -125,21 +147,37 @@ export default function CookieSettingsPage() {
         return () => window.removeEventListener('resize', updateOffsets);
     }, []);
 
+    // Handle hash navigation after offsets are calculated
     useEffect(() => {
         if (headerOffset === 0 || sidebarContentOffset === 0 || hashHandledRef.current) return;
         if (!mainContentRef.current) return;
 
         const hash = typeof window !== 'undefined' ? window.location.hash : '';
         if (hash) {
-            const targetId = hash.substring(1);
-            const el = document.getElementById(targetId);
-            if (el) {
-                const scrollPosition = el.offsetTop - sidebarContentOffset;
-                mainContentRef.current.scrollTo({ top: scrollPosition, behavior: 'auto' });
-                setActiveSection(targetId);
+            // Small delay to ensure DOM is fully rendered
+            setTimeout(() => {
+                const targetId = hash.substring(1);
+                const el = document.getElementById(targetId);
+                if (el && mainContentRef.current) {
+                    const scrollPosition = el.offsetTop - sidebarContentOffset;
+                    mainContentRef.current.scrollTo({ top: scrollPosition, behavior: 'auto' });
+                    setActiveSection(targetId);
+                }
+            }, 50);
+        } else {
+            // Ensure we're at top if no hash
+            if (mainContentRef.current) {
+                mainContentRef.current.scrollTo(0, 0);
             }
         }
-        document.documentElement.style.removeProperty('scroll-behavior');
+        
+        // Re-enable smooth scrolling after initial positioning
+        setTimeout(() => {
+            if (typeof window !== 'undefined') {
+                document.documentElement.style.removeProperty('scroll-behavior');
+            }
+        }, 100);
+        
         hashHandledRef.current = true;
     }, [headerOffset, sidebarContentOffset]);
 
