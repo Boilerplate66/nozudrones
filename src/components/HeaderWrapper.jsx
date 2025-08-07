@@ -59,13 +59,13 @@ export default function HeaderWrapper() {
         {/* Desktop Navigation (hidden on mobile) */}
         <nav className="hidden md:block">
           <ul className="flex space-x-14 text-nozu-dark-grey font-semibold text-lg">
-            {/* Use Link for internal navigation */}
-            <li><Link href="/reviews" className="hover:text-nozu-electric-blue transition-colors duration-200">Drone Reviews</Link></li>
-            <li><Link href="/guides" className="hover:text-nozu-electric-blue transition-colors duration-200">Buying Guides</Link></li>
-            <li><Link href="/laws" className="hover:text-nozu-electric-blue transition-colors duration-200">UK Drone Laws</Link></li>
-            <li><Link href="/safety" className="hover:text-nozu-electric-blue transition-colors duration-200">Safety Tips</Link></li>
-            <li><Link href="/about" className="hover:text-nozu-electric-blue transition-colors duration-200">About Us</Link></li>
-            <li><Link href="/contact" className="hover:text-nozu-electric-blue transition-colors duration-200">Contact</Link></li>
+            {/* Removed 'Drone Reviews' */}
+            <li className="min-w-0"><Link href="/guides" className="hover:text-nozu-electric-blue transition-colors duration-200">Buying Guides</Link></li>
+            <li className="min-w-0"><Link href="/laws" className="hover:text-nozu-electric-blue transition-colors duration-200">UK Drone Laws</Link></li>
+            <li className="min-w-0"><Link href="/safety" className="hover:text-nozu-electric-blue transition-colors duration-200">Safety Tips</Link></li>
+            <li className="min-w-0"><Link href="/faqs" className="hover:text-nozu-electric-blue transition-colors duration-200">FAQs</Link></li> {/* Added 'FAQs' */}
+            <li className="min-w-0"><Link href="/about" className="hover:text-nozu-electric-blue transition-colors duration-200">About Us</Link></li>
+            <li className="min-w-0"><Link href="/contact" className="hover:text-nozu-electric-blue transition-colors duration-200">Contact</Link></li>
           </ul>
         </nav>
       </div>
@@ -89,11 +89,11 @@ export default function HeaderWrapper() {
             </svg>
           </button>
           <ul className="flex flex-col space-y-6 text-nozu-dark-grey font-semibold text-2xl">
-            {/* Use Link for internal navigation and close menu on click */}
-            <li><Link href="/reviews" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">Drone Reviews</Link></li>
+            {/* Removed 'Drone Reviews' from mobile menu */}
             <li><Link href="/guides" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">Buying Guides</Link></li>
             <li><Link href="/laws" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">UK Drone Laws</Link></li>
             <li><Link href="/safety" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">Safety Tips</Link></li>
+            <li><Link href="/faqs" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">FAQs</Link></li> {/* Added 'FAQs' to mobile menu */}
             <li><Link href="/about" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">About Us</Link></li>
             <li><Link href="/contact" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">Contact</Link></li>
           </ul>
