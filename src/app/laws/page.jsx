@@ -1,4 +1,4 @@
-// src/app/laws/page.jsx
+// src/app/laws/page.jsx (v1.1)
 // This page provides an interactive, SEO-friendly guide to UK drone laws with dynamic hover-over detail pages.
 
 "use client";
@@ -279,17 +279,22 @@ export default function LawsPage() {
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 50 }}
             >
-              <button
-                onClick={closeModal}
-                className="absolute top-4 right-4 text-nozu-dark-grey hover:text-nozu-electric-blue transition-colors duration-200"
-                aria-label="Close"
-              >
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2d00/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-              </button>
+              {/* This is the div with the flexbox fix */}
+              <div className="flex justify-between items-start w-full">
+                <h2 className={`text-3xl font-extrabold text-nozu-dark-grey pb-2 border-b-4 mb-6 border-${modalData.color} pr-8`}>
+                  {modalData.title}
+                </h2>
+                <button
+                  onClick={closeModal}
+                  className="top-4 right-4 text-nozu-dark-grey hover:text-nozu-electric-blue transition-colors duration-200"
+                  aria-label="Close"
+                >
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2d00/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
               <div className="prose prose-lg text-nozu-dark-grey max-w-none">
-                <h2 className={`text-3xl font-extrabold text-nozu-dark-grey pb-2 border-b-4 mb-6 border-${modalData.color}`}>{modalData.title}</h2>
                 {modalData.content}
               </div>
             </motion.div>
