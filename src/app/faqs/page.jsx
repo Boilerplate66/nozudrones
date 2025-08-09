@@ -1,5 +1,6 @@
-// src/app/faqs/page.jsx (v6.9)
+// src/app/faqs/page.jsx (v6.10)
 // This file implements automatic lazy loading for FAQ content after the initial page render, ensuring a fast Time to Interactive.
+// The hero subtitle now loads immediately and cycles every 2 seconds, matching the Safety page.
 
 "use client";
 
@@ -117,6 +118,7 @@ const getWashedColorClass = (baseColor) => {
 
 export default function FAQsPage() {
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [modalData, setModalData] = useState({ category: null, color: null });
   const [faqs, setFaqs] = useState({});
   const [openFaqItems, setOpenFaqItems] = useState({});
@@ -126,10 +128,19 @@ export default function FAQsPage() {
   const categories = Object.keys(categoryConfig);
 
   useEffect(() => {
+    // Set a timeout to flip the flag after the component has rendered and the first category is visible
+    const initialLoadTimeout = setTimeout(() => {
+      setIsFirstLoad(false);
+    }, 50); // A very short delay to ensure the component mounts
+
     const interval = setInterval(() => {
       setActiveQuestionIndex((prevIndex) => (prevIndex + 1) % cyclingQuestions.length);
-    }, 4000); // Change question every 4 seconds
-    return () => clearInterval(interval);
+    }, 2000); // Change question every 2 seconds
+    
+    return () => {
+      clearInterval(interval);
+      clearTimeout(initialLoadTimeout);
+    };
   }, []);
 
   // Use a single useEffect to fetch all FAQs and then group them by category.
@@ -213,7 +224,7 @@ export default function FAQsPage() {
             <motion.p
               key={activeQuestionIndex}
               className="text-lg md:text-xl lg:text-2xl font-semibold max-w-2xl mx-auto"
-              initial={{ opacity: 0, y: 20 }}
+              initial={isFirstLoad ? {} : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}

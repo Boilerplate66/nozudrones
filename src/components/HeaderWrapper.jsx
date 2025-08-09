@@ -1,4 +1,6 @@
-// src/components/HeaderWrapper.jsx
+// src/components/HeaderWrapper.jsx (v7.0)
+// This file updates the navigation links for "About Us" and "Contact" to reflect the new file structure.
+
 "use client"; // This component contains client-side interactivity
 
 import React, { useState } from 'react';
@@ -64,8 +66,8 @@ export default function HeaderWrapper() {
             <li className="min-w-0"><Link href="/laws" className="hover:text-nozu-electric-blue transition-colors duration-200">UK Drone Laws</Link></li>
             <li className="min-w-0"><Link href="/safety" className="hover:text-nozu-electric-blue transition-colors duration-200">Safety Tips</Link></li>
             <li className="min-w-0"><Link href="/faqs" className="hover:text-nozu-electric-blue transition-colors duration-200">FAQs</Link></li> {/* Added 'FAQs' */}
-            <li className="min-w-0"><Link href="/about" className="hover:text-nozu-electric-blue transition-colors duration-200">About Us</Link></li>
-            <li className="min-w-0"><Link href="/contact" className="hover:text-nozu-electric-blue transition-colors duration-200">Contact</Link></li>
+            <li className="min-w-0"><Link href="/about/nozudrones" className="hover:text-nozu-electric-blue transition-colors duration-200">About Us</Link></li>
+            <li className="min-w-0"><Link href="/about/contact" className="hover:text-nozu-electric-blue transition-colors duration-200">Contact</Link></li>
           </ul>
         </nav>
       </div>
@@ -94,8 +96,8 @@ export default function HeaderWrapper() {
             <li><Link href="/laws" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">UK Drone Laws</Link></li>
             <li><Link href="/safety" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">Safety Tips</Link></li>
             <li><Link href="/faqs" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">FAQs</Link></li> {/* Added 'FAQs' to mobile menu */}
-            <li><Link href="/about" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">About Us</Link></li>
-            <li><Link href="/contact" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">Contact</Link></li>
+            <li><Link href="/about/nozudrones" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">About Us</Link></li>
+            <li><Link href="/about/contact" onClick={toggleMobileMenu} className="hover:text-nozu-electric-blue transition-colors duration-200">Contact</Link></li>
           </ul>
         </div>
       )}

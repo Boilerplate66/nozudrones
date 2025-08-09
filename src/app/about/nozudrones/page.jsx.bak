@@ -1,0 +1,88 @@
+// src/app/about/page.jsx (v1.0)
+// This file creates the About page, using the hero section layout from the FAQs page and new content for NozuDrones.
+
+import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
+
+// Dummy data for the hero section's cycling phrases
+const cyclingPhrases = [
+  "Building the definitive UK resource for drone users.",
+  "Your guide to safe, legal, and enjoyable drone flying.",
+  "Simplifying UK drone law for first-time pilots.",
+  "In-depth reviews and guides for informed purchasing.",
+];
+
+export default function AboutPage() {
+  const [activePhraseIndex, setActivePhraseIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActivePhraseIndex((prevIndex) => (prevIndex + 1) % cyclingPhrases.length);
+    }, 4000); // Change phrase every 4 seconds
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="min-h-screen font-sans antialiased bg-nozu-white text-nozu-dark-grey overflow-x-hidden">
+      {/* Hero Section */}
+      <div className="relative w-full overflow-hidden h-[200px] flex flex-col items-center justify-center">
+        {/* The hero image container with fluid aspect ratio */}
+        <div className="absolute inset-0">
+          <Image
+            src="/beech-1920x400.jpg"
+            alt="Drone flying over a UK landscape with a beech tree in the foreground"
+            fill
+            style={{ objectFit: 'cover', objectPosition: 'center' }}
+            priority
+          />
+        </div>
+        {/* Content Overlay */}
+        <div className="relative z-10 flex flex-col items-center justify-center text-center text-white bg-nozu-dark-grey bg-opacity-40 w-full h-full px-4">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4">
+            About NozuDrones
+          </h1>
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={activePhraseIndex}
+              className="text-lg md:text-xl lg:text-2xl font-semibold max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+            >
+              {cyclingPhrases[activePhraseIndex]}
+            </motion.p>
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-16">
+        <div className="prose prose-lg mx-auto">
+          <h2>Our Mission</h2>
+          <p>
+            NozuDrones.co.uk was created to be the ultimate online resource for first-time drone users in the UK. We understand that entering the world of drone flying can feel overwhelming, with complex regulations, a huge variety of products, and technical jargon to navigate. Our mission is to simplify this process by providing clear, trustworthy, and accessible information, helping you make informed decisions every step of the way.
+          </p>
+
+          <h2>Who We Are</h2>
+          <p>
+            We are a small team of UK-based enthusiasts passionate about technology and the freedom of drone flying. Our commitment is to provide meticulously researched, expert-level content that adheres to a strict E-E-A-T (Experience, Expertise, Authoritativeness, and Trustworthiness) strategy. We believe that by building a foundation of quality information, we can empower users and contribute positively to the drone community.
+          </p>
+
+          <h2>What We Offer</h2>
+          <ul>
+            <li>**In-depth Guides:** Comprehensive guides on UK drone regulations, flying safety, and maintenance tips.</li>
+            <li>**Product Reviews:** Unbiased and thorough reviews of top drone models relevant to the UK market.</li>
+            <li>**Interactive Tools:** Future tools like our 'Drone Chooser' will help you find the perfect drone for your needs.</li>
+          </ul>
+
+          <h2>Transparency</h2>
+          <p>
+            NozuDrones.co.uk is a participant in various affiliate marketing programs. We earn a commission on qualifying purchases made through our links to retailer sites. This helps support the creation of our content and the maintenance of the website at no extra cost to you. Our reviews and recommendations are always honest and are never influenced by affiliate partnerships.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

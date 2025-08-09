@@ -1,5 +1,6 @@
-// src/app/laws/page.jsx (v1.1)
+// src/app/laws/page.jsx (v1.2)
 // This page provides an interactive, SEO-friendly guide to UK drone laws with dynamic hover-over detail pages.
+// The hero section's subtitle now loads immediately and cycles every 2 seconds, and the hero image height is now a consistent 200px.
 
 "use client";
 
@@ -199,13 +200,23 @@ const getWashedColorClass = (baseColor) => {
 
 export default function LawsPage() {
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [modalData, setModalData] = useState({ title: null, content: null, color: null });
 
   useEffect(() => {
+    // Set a timeout to flip the flag after the component has rendered and the first category is visible
+    const initialLoadTimeout = setTimeout(() => {
+      setIsFirstLoad(false);
+    }, 50); // A very short delay to ensure the component mounts
+
     const interval = setInterval(() => {
       setActiveQuestionIndex((prevIndex) => (prevIndex + 1) % cyclingQuestions.length);
-    }, 4000); // Change question every 4 seconds
-    return () => clearInterval(interval);
+    }, 2000); // Change question every 2 seconds
+    
+    return () => {
+      clearInterval(interval);
+      clearTimeout(initialLoadTimeout);
+    };
   }, []);
 
   const handleCardClick = (category) => {
@@ -219,7 +230,7 @@ export default function LawsPage() {
   return (
     <div className="min-h-screen font-sans antialiased bg-nozu-white text-nozu-dark-grey overflow-x-hidden">
       {/* Hero Section */}
-      <div className="relative w-full overflow-hidden h-[50vh] md:h-[40vh] lg:h-96 flex flex-col items-center justify-center">
+      <div className="relative w-full overflow-hidden h-[200px] flex flex-col items-center justify-center">
         {/* The hero image container with fluid aspect ratio */}
         <div className="absolute inset-0">
           <Image
@@ -239,7 +250,7 @@ export default function LawsPage() {
             <motion.p
               key={activeQuestionIndex}
               className="text-lg md:text-xl lg:text-2xl font-semibold max-w-2xl mx-auto"
-              initial={{ opacity: 0, y: 20 }}
+              initial={isFirstLoad ? {} : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}

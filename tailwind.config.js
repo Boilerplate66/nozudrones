@@ -1,4 +1,4 @@
-// tailwind.config.js
+// tailwind.config.js (v1.1)
 // This file uses CommonJS syntax (module.exports) for compatibility
 // with Next.js and Tailwind CSS v3.
 
@@ -59,6 +59,15 @@ module.exports = {
         'nozu-card-rust-orange-washed': 'hsl(25, 60%, 95%)',
         'nozu-card-storm-grey-washed': 'hsl(210, 10%, 95%)',
         'nozu-card-vivid-red-washed': 'hsl(7, 90%, 95%)',
+        'nozu-card-coral/90': 'hsla(16, 100%, 60%, 0.9)',
+        'nozu-card-forest-green/90': 'hsla(140, 45%, 35%, 0.9)',
+        'nozu-card-ocean-blue/90': 'hsla(205, 70%, 50%, 0.9)',
+        'nozu-card-golden-yellow/90': 'hsla(45, 100%, 55%, 0.9)',
+        'nozu-card-river-blue/90': 'hsla(217, 33%, 34%, 0.9)',
+        'nozu-card-seafoam-green/90': 'hsla(160, 60%, 70%, 0.9)',
+        'nozu-card-rust-orange/90': 'hsla(25, 60%, 50%, 0.9)',
+        'nozu-card-storm-grey/90': 'hsla(210, 10%, 40%, 0.9)',
+        'nozu-card-vivid-red/90': 'hsla(7, 90%, 50%, 0.9)',
       },
       // Customize the @tailwindcss/typography plugin
       typography: ({ theme }) => ({
@@ -156,6 +165,10 @@ module.exports = {
     {
       // Matches all `bg-nozu-card-<color>-washed` classes for the modal background
       pattern: /bg-nozu-card-(coral|forest-green|ocean-blue|golden-yellow|river-blue|seafoam-green|rust-orange|storm-grey|vivid-red)-washed/,
+    },
+    {
+      // Matches all `bg-nozu-card-<color>/90` classes for the main cards with 90% opacity
+      pattern: /bg-nozu-card-(coral|forest-green|ocean-blue|golden-yellow|river-blue|seafoam-green|rust-orange|storm-grey|vivid-red)\/90/,
     },
     {
       // Matches all `border-nozu-card-<color>` classes for the modal border stripe and heading underline
