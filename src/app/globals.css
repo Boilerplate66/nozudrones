@@ -1,4 +1,4 @@
-/* src/app/globals.css */
+/* src/app/globals.css v1.0.0 */
 
 /* Tailwind CSS v3 directives */
 @tailwind base;
@@ -7,13 +7,13 @@
 
 /* Adjust scroll position for sticky headers */
 html {
-  scroll-padding-top: 111px; /* Mobile header height */
+    scroll-padding-top: 111px; /* Mobile header height */
 }
 
 @media (min-width: 768px) {
-  html {
-    scroll-padding-top: 160px; /* Desktop header height */
-  }
+    html {
+        scroll-padding-top: 160px; /* Desktop header height */
+    }
 }
 
 /* Global body styles */
@@ -95,4 +95,53 @@ a {
     .nozu-mobile-sidebar-container {
         display: block; /* Show as a block on medium screens and up */
     }
+}
+
+/* Custom utility for text shadow, to ensure readability over video */
+.text-shadow-lg {
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.75);
+}
+
+/* New Hero Section CSS - Placed at the end for clarity */
+.hero-section {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.video-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.hero-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+.hero-video.active {
+  opacity: 0.6; /* Video opacity is 60% */
+}
+
+.overlay {
+  position: relative;
+  z-index: 2;
+  color: white;
+  padding: 1rem;
 }
