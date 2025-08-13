@@ -1,7 +1,7 @@
-// src/app/page.jsx v2.0.7
+// src/app/page.jsx v2.14.0
 'use client'; // This directive marks the component as a Client Component
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion';
@@ -9,12 +9,13 @@ import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion'
 // Import your components
 import NozuLogo from '../components/NozuLogo';
 
-// Define the content for the Hero section
+// Define the content for the Hero section with new videos and messages
 const heroContent = [
-  { message: "Master the skies", digit: 1 },
-  { message: "Choose the right drone", digit: 2 },
-  { message: "Fly safely", digit: 3 },
-  { message: "Stay within the law", digit: 4 },
+  { message: "Capture the impossible", digit: 1, videoDesktop: "/hero-clip-rainbow-1920x1080.mp4", videoMobile: "/hero-clip-rainbow-1280x720.mp4", objectPosition: "center" },
+  { message: "Follow the journey", digit: 2, videoDesktop: "/hero-clip-bike-1920x1080.mp4", videoMobile: "/hero-clip-bike-1280x720.mp4", objectPosition: "bottom" },
+  { message: "Explore the peaks", digit: 3, videoDesktop: "/hero-clip-mountain-1920x1080.mp4", videoMobile: "/hero-clip-mountain-1280x720.mp4", objectPosition: "center" },
+  { message: "Chase new adventures", digit: 4, videoDesktop: "/hero-clip-dog-1920x1080.mp4", videoMobile: "/hero-clip-dog-1280x720.mp4", objectPosition: "center" },
+  { message: "Ride the big waves", digit: 5, videoDesktop: "/hero-clip-surf-1920x1080.mp4", videoMobile: "/hero-clip-surf-1280x720.mp4", objectPosition: "bottom" },
 ];
 
 // Data for the Interactive Showcase section
@@ -32,12 +33,47 @@ const specsSpotlightData = [
   { message: "UK-Compliant Sensors", time: 5.5, link: "/guides/sensor-tech" },
 ];
 
+// Animation variants for staggered word reveal
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1, // Delay between each child animation
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 10,
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: -20,
+    transition: {
+      ease: "easeInOut",
+      duration: 0.5,
+    },
+  },
+};
+
 export default function Home() {
   const heroVideoRef = useRef(null);
   const coreMessageRef = useRef(null);
   const specsVideoRef = useRef(null);
   const [activeMessageIndex, setActiveMessageIndex] = useState(0);
   const [interactiveImage, setInteractiveImage] = useState(interactiveShowcaseData[0].image);
+  const words = heroContent[activeMessageIndex].message.split(" ");
+  const [isMessageVisible, setIsMessageVisible] = useState(true);
+  const [videoObjectPosition, setVideoObjectPosition] = useState(heroContent[0].objectPosition);
 
   // Framer Motion scroll hook for Core Message Split Screen
   const { scrollYProgress } = useScroll({ target: coreMessageRef });
@@ -50,38 +86,75 @@ export default function Home() {
   const specsVideoTime = useTransform(specsScrollYProgress, [0, 1], [0, 8]); // Video is 4s, played at 0.5x speed for 8s
   const [currentSpecsMessage, setCurrentSpecsMessage] = useState(specsSpotlightData[0]);
 
-  // Hero Video & Text Carousel Logic
+  // This effect handles the video playback and message changes.
   useEffect(() => {
     const videoElement = heroVideoRef.current;
-    let messageTimer;
-
     if (videoElement) {
-      const playVideoFromStart = () => {
-        videoElement.currentTime = 0;
-        videoElement.play().catch(error => console.error("Video play failed:", error));
+      const handleVideoEnd = () => {
+        setActiveMessageIndex((prevIndex) => (prevIndex + 1) % heroContent.length);
       };
 
-      const intervalDuration = 4000;
-      playVideoFromStart();
-      messageTimer = setInterval(() => {
-        setActiveMessageIndex((prevIndex) => (prevIndex + 1) % heroContent.length);
-        playVideoFromStart();
-      }, intervalDuration);
+      const handleTimeUpdate = () => {
+        // Trigger fade-out 1 second before the video ends
+        // This accounts for the 0.5s animation duration + 0.5s buffer
+        if (videoElement.duration && videoElement.currentTime >= videoElement.duration - 1.0) {
+          setIsMessageVisible(false);
+        }
 
-      return () => clearInterval(messageTimer);
+        // Handle the pan animation for the bike video only
+        if (heroContent[activeMessageIndex].message === "Follow the journey") {
+          const videoDuration = videoElement.duration || 1; // Fallback to 1 to avoid division by zero
+          const currentTime = videoElement.currentTime;
+
+          let panProgress;
+          if (currentTime <= 3.5) {
+            // Pan up from bottom to top (0% to 100%) in the first 3.5 seconds
+            panProgress = (currentTime / 3.5);
+          } else {
+            // Pan back down from top to bottom (100% to 0%) for the rest of the video
+            const remainingTime = videoDuration - 3.5;
+            if (remainingTime > 0) {
+              panProgress = 1 - ((currentTime - 3.5) / remainingTime);
+            } else {
+              panProgress = 0;
+            }
+          }
+
+          // Invert the panProgress to make it go from bottom (100%) to top (0%)
+          const invertedProgress = 1 - panProgress;
+          setVideoObjectPosition(`50% ${invertedProgress * 100}%`);
+        } else {
+          // Reset to default objectPosition for other videos
+          setVideoObjectPosition(heroContent[activeMessageIndex].objectPosition);
+        }
+      };
+
+      // Reset message visibility and object position when the video source changes
+      const handleLoadedData = () => {
+        setIsMessageVisible(true);
+        setVideoObjectPosition(heroContent[activeMessageIndex].objectPosition);
+      };
+      
+      videoElement.addEventListener('loadeddata', handleLoadedData);
+      videoElement.addEventListener('timeupdate', handleTimeUpdate);
+      videoElement.addEventListener('ended', handleVideoEnd);
+
+      return () => {
+        videoElement.removeEventListener('loadeddata', handleLoadedData);
+        videoElement.removeEventListener('timeupdate', handleTimeUpdate);
+        videoElement.removeEventListener('ended', handleVideoEnd);
+      };
     }
-  }, []);
+  }, [activeMessageIndex]);
 
   // Specs Spotlight Logic
   useEffect(() => {
     const videoElement = specsVideoRef.current;
     if (!videoElement) return;
 
-    // This effect handles the video scrubbing and message changes
     const unsubscribeScroll = specsVideoTime.on('change', (latestTime) => {
       videoElement.currentTime = latestTime;
 
-      // Update the message based on video time
       const nextMessage = specsSpotlightData.find(
         (message, index) => latestTime >= message.time && (index === specsSpotlightData.length - 1 || latestTime < specsSpotlightData[index + 1].time)
       );
@@ -97,18 +170,19 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <main className="flex-grow">
         {/* ======================= Hero Section ======================= */}
-        <section className="relative h-[calc(75vh-64px)] overflow-hidden flex items-center justify-center text-center">
+        <section className="relative h-[calc(85vh-64px)] overflow-hidden flex items-center justify-center text-center">
           <video
             ref={heroVideoRef}
             autoPlay
-            loop
             muted
             playsInline
             preload="auto"
+            key={heroContent[activeMessageIndex].videoDesktop}
             className="absolute inset-0 w-full h-full object-cover z-0"
+            style={{ objectPosition: videoObjectPosition }}
           >
-            <source src="/Car-Forrest-2.mp4" type="video/mp4" />
-            <source src="/Car-Forrest-2.webm" type="video/webm" />
+            <source src={heroContent[activeMessageIndex].videoDesktop} type="video/mp4" media="(min-width: 769px)" />
+            <source src={heroContent[activeMessageIndex].videoMobile} type="video/mp4" media="(max-width: 768px)" />
           </video>
           <AnimatePresence mode="wait">
             <motion.div
@@ -124,16 +198,30 @@ export default function Home() {
           </AnimatePresence>
           <div className="max-w-5xl mx-auto space-y-10 relative z-10 text-white">
             <AnimatePresence mode="wait">
-              <motion.h1
-                key={heroContent[activeMessageIndex].message}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
-                className="text-6xl md:text-8xl font-extrabold text-white text-shadow-lg leading-tight md:leading-tight mt-10"
-              >
-                {heroContent[activeMessageIndex].message}
-              </motion.h1>
+              {isMessageVisible && (
+                <motion.h1
+                  key={heroContent[activeMessageIndex].message}
+                  className="text-6xl md:text-8xl font-extrabold text-white text-shadow-lg leading-tight md:leading-tight mt-10"
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="show"
+                  exit="exit"
+                >
+                  {words.map((word, index) => (
+                    <motion.span
+                      key={index}
+                      className="inline-block"
+                      variants={itemVariants}
+                      initial="hidden"
+                      animate="show"
+                      exit="exit"
+                    >
+                      {word}
+                      {index < words.length - 1 && <>&nbsp;</>}
+                    </motion.span>
+                  ))}
+                </motion.h1>
+              )}
             </AnimatePresence>
           </div>
         </section>
