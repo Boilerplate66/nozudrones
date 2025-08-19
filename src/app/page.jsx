@@ -1,4 +1,5 @@
-// src/app/page.jsx v2.14.0
+// src/app/page.jsx v2.17.4
+// This version re-implements the drone controller visual and the freeze-frame effect for the Core Message section.
 'use client'; // This directive marks the component as a Client Component
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -11,11 +12,12 @@ import NozuLogo from '../components/NozuLogo';
 
 // Define the content for the Hero section with new videos and messages
 const heroContent = [
-  { message: "Capture the impossible", digit: 1, videoDesktop: "/hero-clip-rainbow-1920x1080.mp4", videoMobile: "/hero-clip-rainbow-1280x720.mp4", objectPosition: "center" },
-  { message: "Follow the journey", digit: 2, videoDesktop: "/hero-clip-bike-1920x1080.mp4", videoMobile: "/hero-clip-bike-1280x720.mp4", objectPosition: "bottom" },
-  { message: "Explore the peaks", digit: 3, videoDesktop: "/hero-clip-mountain-1920x1080.mp4", videoMobile: "/hero-clip-mountain-1280x720.mp4", objectPosition: "center" },
-  { message: "Chase new adventures", digit: 4, videoDesktop: "/hero-clip-dog-1920x1080.mp4", videoMobile: "/hero-clip-dog-1280x720.mp4", objectPosition: "center" },
-  { message: "Ride the big waves", digit: 5, videoDesktop: "/hero-clip-surf-1920x1080.mp4", videoMobile: "/hero-clip-surf-1280x720.mp4", objectPosition: "bottom" },
+  // New 'mobilePan' property defines the cropping/panning for mobile view
+  { message: "Capture the impossible", digit: 1, videoDesktop: "/hero-clip-rainbow-1920x1080.mp4", videoMobile: "/hero-clip-rainbow-1280x720.mp4", objectPositionDesktop: "center", objectPositionMobile: "center" },
+  { message: "Follow the journey", digit: 2, videoDesktop: "/hero-clip-bike-1920x1080.mp4", videoMobile: "/hero-clip-bike-1280x720.mp4", objectPositionDesktop: "bottom", objectPositionMobile: "left" },
+  { message: "Explore the peaks", digit: 3, videoDesktop: "/hero-clip-mountain-1920x1080.mp4", videoMobile: "/hero-clip-mountain-1280x720.mp4", objectPositionDesktop: "center", objectPositionMobile: "center" },
+  { message: "Chase new adventures", digit: 4, videoDesktop: "/hero-clip-dog-1920x1080.mp4", videoMobile: "/hero-clip-dog-1280x720.mp4", objectPositionDesktop: "center", objectPositionMobile: "right" },
+  { message: "Ride the big waves", digit: 5, videoDesktop: "/hero-clip-surf-1920x1080.mp4", videoMobile: "/hero-clip-surf-1280x720.mp4", objectPositionDesktop: "bottom", objectPositionMobile: "pan-left-to-center" },
 ];
 
 // Data for the Interactive Showcase section
@@ -68,18 +70,18 @@ const itemVariants = {
 export default function Home() {
   const heroVideoRef = useRef(null);
   const coreMessageRef = useRef(null);
+  const coreVideoRef = useRef(null);
   const specsVideoRef = useRef(null);
   const [activeMessageIndex, setActiveMessageIndex] = useState(0);
   const [interactiveImage, setInteractiveImage] = useState(interactiveShowcaseData[0].image);
   const words = heroContent[activeMessageIndex].message.split(" ");
   const [isMessageVisible, setIsMessageVisible] = useState(true);
-  const [videoObjectPosition, setVideoObjectPosition] = useState(heroContent[0].objectPosition);
+  const [videoObjectPosition, setVideoObjectPosition] = useState(heroContent[0].objectPositionDesktop);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isDroneViewCaptured, setIsDroneViewCaptured] = useState(false);
 
   // Framer Motion scroll hook for Core Message Split Screen
   const { scrollYProgress } = useScroll({ target: coreMessageRef });
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.5]);
-  const y = useTransform(scrollYProgress, [0, 1], [0, -100]);
-  const borderRadius = useTransform(scrollYProgress, [0, 1], [0, 20]);
 
   // Framer Motion scroll hook for Specs Spotlight
   const { scrollYProgress: specsScrollYProgress } = useScroll({ target: specsVideoRef });
@@ -88,6 +90,12 @@ export default function Home() {
 
   // This effect handles the video playback and message changes.
   useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize();
+
     const videoElement = heroVideoRef.current;
     if (videoElement) {
       const handleVideoEnd = () => {
@@ -95,46 +103,50 @@ export default function Home() {
       };
 
       const handleTimeUpdate = () => {
-        // Trigger fade-out 1 second before the video ends
-        // This accounts for the 0.5s animation duration + 0.5s buffer
         if (videoElement.duration && videoElement.currentTime >= videoElement.duration - 1.0) {
           setIsMessageVisible(false);
         }
-
-        // Handle the pan animation for the bike video only
-        if (heroContent[activeMessageIndex].message === "Follow the journey") {
-          const videoDuration = videoElement.duration || 1; // Fallback to 1 to avoid division by zero
-          const currentTime = videoElement.currentTime;
-
-          let panProgress;
-          if (currentTime <= 3.5) {
-            // Pan up from bottom to top (0% to 100%) in the first 3.5 seconds
-            panProgress = (currentTime / 3.5);
+        if (isMobile) {
+          const videoDuration = videoElement.duration || 1;
+          const currentVideo = heroContent[activeMessageIndex];
+          if (currentVideo.objectPositionMobile === "pan-left-to-center") {
+            const panProgress = (videoElement.currentTime / videoDuration) * 50;
+            setVideoObjectPosition(`${panProgress}% 50%`);
           } else {
-            // Pan back down from top to bottom (100% to 0%) for the rest of the video
-            const remainingTime = videoDuration - 3.5;
-            if (remainingTime > 0) {
-              panProgress = 1 - ((currentTime - 3.5) / remainingTime);
-            } else {
-              panProgress = 0;
-            }
+            setVideoObjectPosition(currentVideo.objectPositionMobile);
           }
-
-          // Invert the panProgress to make it go from bottom (100%) to top (0%)
-          const invertedProgress = 1 - panProgress;
-          setVideoObjectPosition(`50% ${invertedProgress * 100}%`);
         } else {
-          // Reset to default objectPosition for other videos
-          setVideoObjectPosition(heroContent[activeMessageIndex].objectPosition);
+          if (heroContent[activeMessageIndex].message === "Follow the journey") {
+            const videoDuration = videoElement.duration || 1;
+            const currentTime = videoElement.currentTime;
+            let panProgress;
+            if (currentTime <= 3.5) {
+              panProgress = (currentTime / 3.5);
+            } else {
+              const remainingTime = videoDuration - 3.5;
+              if (remainingTime > 0) {
+                panProgress = 1 - ((currentTime - 3.5) / remainingTime);
+              } else {
+                panProgress = 0;
+              }
+            }
+            const invertedProgress = 1 - panProgress;
+            setVideoObjectPosition(`50% ${invertedProgress * 100}%`);
+          } else {
+            setVideoObjectPosition(heroContent[activeMessageIndex].objectPositionDesktop);
+          }
         }
       };
 
-      // Reset message visibility and object position when the video source changes
       const handleLoadedData = () => {
         setIsMessageVisible(true);
-        setVideoObjectPosition(heroContent[activeMessageIndex].objectPosition);
+        if (isMobile) {
+          setVideoObjectPosition(heroContent[activeMessageIndex].objectPositionMobile);
+        } else {
+          setVideoObjectPosition(heroContent[activeMessageIndex].objectPositionDesktop);
+        }
       };
-      
+
       videoElement.addEventListener('loadeddata', handleLoadedData);
       videoElement.addEventListener('timeupdate', handleTimeUpdate);
       videoElement.addEventListener('ended', handleVideoEnd);
@@ -143,9 +155,26 @@ export default function Home() {
         videoElement.removeEventListener('loadeddata', handleLoadedData);
         videoElement.removeEventListener('timeupdate', handleTimeUpdate);
         videoElement.removeEventListener('ended', handleVideoEnd);
+        window.removeEventListener('resize', handleResize);
       };
     }
-  }, [activeMessageIndex]);
+  }, [activeMessageIndex, isMobile]);
+
+  // New logic for the Core Message section
+  useEffect(() => {
+    const videoElement = coreVideoRef.current;
+    if (!videoElement) return;
+
+    const unsubscribeScroll = scrollYProgress.on('change', (latest) => {
+      // Trigger the freeze-frame transition when the user scrolls 25% of the way down the section
+      if (latest >= 0.25 && !isDroneViewCaptured) {
+        setIsDroneViewCaptured(true);
+        videoElement.pause();
+      }
+    });
+
+    return () => unsubscribeScroll();
+  }, [scrollYProgress, isDroneViewCaptured]);
 
   // Specs Spotlight Logic
   useEffect(() => {
@@ -154,7 +183,6 @@ export default function Home() {
 
     const unsubscribeScroll = specsVideoTime.on('change', (latestTime) => {
       videoElement.currentTime = latestTime;
-
       const nextMessage = specsSpotlightData.find(
         (message, index) => latestTime >= message.time && (index === specsSpotlightData.length - 1 || latestTime < specsSpotlightData[index + 1].time)
       );
@@ -170,14 +198,14 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <main className="flex-grow">
         {/* ======================= Hero Section ======================= */}
-        <section className="relative h-[calc(85vh-64px)] overflow-hidden flex items-center justify-center text-center">
+        <section className="relative h-[calc(85vh-64px)] lg:h-[calc(85vh-64px)] md:h-[calc(85vh-64px)] h-[40vh] overflow-hidden flex items-center justify-center text-center">
           <video
             ref={heroVideoRef}
             autoPlay
             muted
             playsInline
             preload="auto"
-            key={heroContent[activeMessageIndex].videoDesktop}
+            key={isMobile ? heroContent[activeMessageIndex].videoMobile : heroContent[activeMessageIndex].videoDesktop}
             className="absolute inset-0 w-full h-full object-cover z-0"
             style={{ objectPosition: videoObjectPosition }}
           >
@@ -196,12 +224,12 @@ export default function Home() {
               {heroContent[activeMessageIndex].digit}
             </motion.div>
           </AnimatePresence>
-          <div className="max-w-5xl mx-auto space-y-10 relative z-10 text-white">
+          <div className="absolute bottom-4 right-4 z-10 text-white md:relative md:max-w-5xl md:mx-auto md:space-y-10 md:text-center">
             <AnimatePresence mode="wait">
               {isMessageVisible && (
                 <motion.h1
                   key={heroContent[activeMessageIndex].message}
-                  className="text-6xl md:text-8xl font-extrabold text-white text-shadow-lg leading-tight md:leading-tight mt-10"
+                  className="text-2xl md:text-8xl font-extrabold text-white text-shadow-lg leading-tight md:leading-tight"
                   variants={containerVariants}
                   initial="hidden"
                   animate="show"
@@ -227,16 +255,63 @@ export default function Home() {
         </section>
 
         {/* ======================= Core Message Split Screen ======================= */}
-        <section ref={coreMessageRef} className="relative bg-nozu-white py-20 px-4 min-h-[200vh] flex">
-          <div className="sticky top-0 left-0 h-screen w-1/2 flex items-center justify-center">
-            <motion.div style={{ scale, y, borderRadius }} className="relative w-full h-[80vh]">
-              <Image src="/aerial-view.webp" alt="Cinematic aerial view" fill className="object-cover rounded-lg" />
-              <div className="absolute inset-0 flex items-center justify-center p-8 bg-nozu-dark-grey/50 rounded-lg">
-                <Image src="/drone-controller.webp" alt="Drone controller screen" width={500} height={300} className="object-contain" />
-              </div>
-            </motion.div>
+        <section ref={coreMessageRef} className="relative bg-nozu-white py-20 px-4 min-h-[200vh] flex flex-col items-center">
+          <div className="sticky top-0 w-full max-w-7xl h-screen flex items-center justify-center">
+            <div className="relative w-full aspect-video rounded-lg overflow-hidden shadow-xl">
+              <AnimatePresence>
+                {!isDroneViewCaptured && (
+                  <motion.div
+                    key="live-view"
+                    initial={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.2 }}
+                    transition={{ duration: 0.5 }}
+                    className="absolute inset-0"
+                  >
+                    <video
+                      ref={coreVideoRef}
+                      autoPlay
+                      muted
+                      playsInline
+                      preload="auto"
+                      className="absolute inset-0 w-full h-full object-cover"
+                    >
+                      <source src="/Desert-1920X1080.mp4" type="video/mp4" />
+                    </video>
+                  </motion.div>
+                )}
+                {isDroneViewCaptured && (
+                  <motion.div
+                    key="controller-view"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    className="absolute inset-0 w-full h-full"
+                  >
+                    <Image
+                      src="/ai-drone-controller.webp"
+                      alt="Person operating drone with controller"
+                      fill
+                      className="object-cover"
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, x: -100, y: -100, rotate: -20 }}
+                      animate={{ opacity: 1, x: 0, y: 0, rotate: 0 }}
+                      transition={{ duration: 0.8, delay: 0.5 }}
+                      className="absolute w-[30%] h-[30%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                    >
+                      <Image
+                        src="/image_7d6fcc.jpg"
+                        alt="Captured drone view"
+                        fill
+                        className="object-cover"
+                      />
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
-          <div className="w-1/2 p-12 space-y-16">
+          <div className="w-full max-w-7xl p-12 space-y-16 mt-20 md:mt-0">
             <h2 className="text-4xl md:text-5xl font-bold text-nozu-electric-blue">Our Mission</h2>
             <div className="space-y-12">
               <p className="text-lg text-nozu-dark-grey">At NozuDrones, we believe that the sky is not the limit, it’s just the beginning. Our mission is to empower everyone from hobbyists to professionals to master the art of flight.</p>
