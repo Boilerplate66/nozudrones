@@ -1,11 +1,11 @@
-// src/app/page.jsx v2.17.4
-// This version re-implements the drone controller visual and the freeze-frame effect for the Core Message section.
+// src/app/page.jsx v2.40.18
+// This update adds a key to the parent animation div to ensure it resets properly on each loop, which may resolve the visual issue.
 'use client'; // This directive marks the component as a Client Component
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion';
+import { AnimatePresence, motion, useScroll, useTransform, useAnimation } from 'framer-motion';
 
 // Import your components
 import NozuLogo from '../components/NozuLogo';
@@ -17,7 +17,7 @@ const heroContent = [
   { message: "Follow the journey", digit: 2, videoDesktop: "/hero-clip-bike-1920x1080.mp4", videoMobile: "/hero-clip-bike-1280x720.mp4", objectPositionDesktop: "bottom", objectPositionMobile: "left" },
   { message: "Explore the peaks", digit: 3, videoDesktop: "/hero-clip-mountain-1920x1080.mp4", videoMobile: "/hero-clip-mountain-1280x720.mp4", objectPositionDesktop: "center", objectPositionMobile: "center" },
   { message: "Chase new adventures", digit: 4, videoDesktop: "/hero-clip-dog-1920x1080.mp4", videoMobile: "/hero-clip-dog-1280x720.mp4", objectPositionDesktop: "center", objectPositionMobile: "right" },
-  { message: "Ride the big waves", digit: 5, videoDesktop: "/hero-clip-surf-1920x1080.mp4", videoMobile: "/hero-clip-surf-1280x720.mp4", objectPositionDesktop: "bottom", objectPositionMobile: "pan-left-to-center" },
+  { message: "Ride the big waves", digit: 5, videoDesktop: "/hero-clip-surf-1280x720.mp4", videoMobile: "/hero-clip-surf-1280x720.mp4", objectPositionDesktop: "bottom", objectPositionMobile: "pan-left-to-center" },
 ];
 
 // Data for the Interactive Showcase section
@@ -34,6 +34,34 @@ const specsSpotlightData = [
   { message: "Advanced Battery System", time: 3.5, link: "/guides/battery-tech" },
   { message: "UK-Compliant Sensors", time: 5.5, link: "/guides/sensor-tech" },
 ];
+
+// New content for the Core Message 2x2 grid
+const coreMessageGridContent = {
+  topLeft: {
+    title: "Choosing",
+    text: "Choosing your first drone can be overwhelming. That's why we take the confusion out of the buying process, helping you find the perfect drone to match your budget and flying style. With our clear, simple guides, you'll be **ready to fly** and capture incredible aerial content from day one.",
+    image: "/blue-drone.jpg",
+    alt: "Placeholder image of a blue drone",
+    color: "bg-nozu-sky-blue",
+    animation: { initial: { x: -200, opacity: 0 }, whileInView: { x: 0, opacity: 1 }, transition: { duration: 0.8 } },
+  },
+  bottomLeft: {
+    title: "Safety",
+    text: "Safety is our highest priority. We provide practical, step-by-step guides on everything you need to know before you fly. By learning essential safety checks and best practices, you'll feel confident and reassured, so you are always **ready to fly** without harm.",
+    image: "/blue-drone.jpg",
+    alt: "Placeholder image of a blue drone",
+    color: "bg-nozu-lime-green-refined/30",
+    animation: { initial: { y: 200, opacity: 0 }, whileInView: { y: 0, opacity: 1 }, transition: { duration: 0.8 } },
+  },
+  bottomRight: {
+    title: "Legal",
+    text: "Navigating UK drone law is essential. We clarify the rules set by the Civil Aviation Authority (CAA), so you understand where you can fly and how to stay compliant. With our reliable and up-to-date information, you can pilot your drone knowing you are legally **ready to fly**.",
+    image: "/blue-drone.jpg",
+    alt: "Placeholder image of a blue drone",
+    color: "bg-nozu-electric-blue/30",
+    animation: { initial: { x: 200, opacity: 0 }, whileInView: { x: 0, opacity: 1 }, transition: { duration: 0.8 } },
+  },
+};
 
 // Animation variants for staggered word reveal
 const containerVariants = {
@@ -70,7 +98,6 @@ const itemVariants = {
 export default function Home() {
   const heroVideoRef = useRef(null);
   const coreMessageRef = useRef(null);
-  const coreVideoRef = useRef(null);
   const specsVideoRef = useRef(null);
   const [activeMessageIndex, setActiveMessageIndex] = useState(0);
   const [interactiveImage, setInteractiveImage] = useState(interactiveShowcaseData[0].image);
@@ -78,10 +105,9 @@ export default function Home() {
   const [isMessageVisible, setIsMessageVisible] = useState(true);
   const [videoObjectPosition, setVideoObjectPosition] = useState(heroContent[0].objectPositionDesktop);
   const [isMobile, setIsMobile] = useState(false);
-  const [isDroneViewCaptured, setIsDroneViewCaptured] = useState(false);
 
-  // Framer Motion scroll hook for Core Message Split Screen
-  const { scrollYProgress } = useScroll({ target: coreMessageRef });
+  // New state for the animated video sequence
+  const [animationStep, setAnimationStep] = useState(0);
 
   // Framer Motion scroll hook for Specs Spotlight
   const { scrollYProgress: specsScrollYProgress } = useScroll({ target: specsVideoRef });
@@ -137,7 +163,7 @@ export default function Home() {
           }
         }
       };
-
+      
       const handleLoadedData = () => {
         setIsMessageVisible(true);
         if (isMobile) {
@@ -146,6 +172,7 @@ export default function Home() {
           setVideoObjectPosition(heroContent[activeMessageIndex].objectPositionDesktop);
         }
       };
+
 
       videoElement.addEventListener('loadeddata', handleLoadedData);
       videoElement.addEventListener('timeupdate', handleTimeUpdate);
@@ -160,21 +187,38 @@ export default function Home() {
     }
   }, [activeMessageIndex, isMobile]);
 
-  // New logic for the Core Message section
+  // New logic for the Animated Video Sequence
   useEffect(() => {
-    const videoElement = coreVideoRef.current;
-    if (!videoElement) return;
+    const sequence = async () => {
+      // Step 1: Start video
+      setAnimationStep(1);
+      // Wait for 10 seconds to allow video to play completely
+      await new Promise(r => setTimeout(r, 10000)); 
 
-    const unsubscribeScroll = scrollYProgress.on('change', (latest) => {
-      // Trigger the freeze-frame transition when the user scrolls 25% of the way down the section
-      if (latest >= 0.25 && !isDroneViewCaptured) {
-        setIsDroneViewCaptured(true);
-        videoElement.pause();
-      }
-    });
+      // Step 2: Flash
+      setAnimationStep(2);
+      await new Promise(r => setTimeout(r, 200));
 
-    return () => unsubscribeScroll();
-  }, [scrollYProgress, isDroneViewCaptured]);
+      // Step 3: Show new screen (controller + still frame)
+      setAnimationStep(3);
+      await new Promise(r => setTimeout(r, 500)); 
+      
+      // Step 4: Animate into controller screen
+      setAnimationStep(4);
+      await new Promise(r => setTimeout(r, 500)); 
+
+      // Step 5: Hold for 2 seconds
+      setAnimationStep(5);
+      await new Promise(r => setTimeout(r, 2000));
+
+      // Step 6: Repeat
+      setAnimationStep(0); // Reset to trigger re-render and restart
+    };
+
+    if (animationStep === 0) {
+      sequence();
+    }
+  }, [animationStep]);
 
   // Specs Spotlight Logic
   useEffect(() => {
@@ -254,70 +298,142 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ======================= Core Message Split Screen ======================= */}
-        <section ref={coreMessageRef} className="relative bg-nozu-white py-20 px-4 min-h-[200vh] flex flex-col items-center">
-          <div className="sticky top-0 w-full max-w-7xl h-screen flex items-center justify-center">
-            <div className="relative w-full aspect-video rounded-lg overflow-hidden shadow-xl">
-              <AnimatePresence>
-                {!isDroneViewCaptured && (
-                  <motion.div
-                    key="live-view"
-                    initial={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 1.2 }}
-                    transition={{ duration: 0.5 }}
-                    className="absolute inset-0"
-                  >
-                    <video
-                      ref={coreVideoRef}
-                      autoPlay
-                      muted
-                      playsInline
-                      preload="auto"
-                      className="absolute inset-0 w-full h-full object-cover"
-                    >
-                      <source src="/Desert-1920X1080.mp4" type="video/mp4" />
-                    </video>
-                  </motion.div>
-                )}
-                {isDroneViewCaptured && (
-                  <motion.div
-                    key="controller-view"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                    className="absolute inset-0 w-full h-full"
-                  >
-                    <Image
-                      src="/ai-drone-controller.webp"
-                      alt="Person operating drone with controller"
-                      fill
-                      className="object-cover"
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, x: -100, y: -100, rotate: -20 }}
-                      animate={{ opacity: 1, x: 0, y: 0, rotate: 0 }}
-                      transition={{ duration: 0.8, delay: 0.5 }}
-                      className="absolute w-[30%] h-[30%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-                    >
-                      <Image
-                        src="/image_7d6fcc.jpg"
-                        alt="Captured drone view"
-                        fill
-                        className="object-cover"
+        {/* ======================= Core Message 2x2 Grid Section ======================= */}
+        <section ref={coreMessageRef} className="relative bg-nozu-white py-6 px-4">
+          <div className="max-w-screen-xl mx-auto">
+            <h2 className="text-4xl md:text-5xl lg:text-7xl font-bold text-nozu-electric-blue text-center mb-8 lg:mb-12">
+              Equipping you to fly.
+            </h2>
+            {/* NEW: This container provides the 2x2 grid layout on larger screens. */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* This is the top-left item (the 'Choosing' box) */}
+              <motion.div
+                initial={coreMessageGridContent.topLeft.animation.initial}
+                whileInView={coreMessageGridContent.topLeft.animation.whileInView}
+                transition={coreMessageGridContent.topLeft.animation.transition}
+                viewport={{ once: true, amount: 0.3 }}
+                className={`flex flex-col justify-center space-y-6 p-8 bg-nozu-sky-blue min-h-[300px]`}
+              >
+                <h3 className="text-3xl md:text-4xl font-bold text-nozu-electric-blue">
+                  {coreMessageGridContent.topLeft.title}
+                </h3>
+                <p 
+                  className="text-lg text-nozu-dark-grey"
+                  dangerouslySetInnerHTML={{ __html: coreMessageGridContent.topLeft.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}
+                />
+              </motion.div>
+              {/* This is the top-right item (the animation) */}
+              <div className="relative w-full h-auto aspect-video overflow-hidden shadow-xl min-h-[300px]">
+                <AnimatePresence key={animationStep}>
+                    {animationStep === 1 && (
+                      <motion.video
+                        key="video"
+                        initial={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        autoPlay
+                        muted
+                        playsInline
+                        preload="auto"
+                        className="absolute inset-0 w-full h-full object-cover"
+                      >
+                        <source src="/Desert-1920X1080.mp4" type="video/mp4" />
+                      </motion.video>
+                    )}
+                    {animationStep === 2 && (
+                      <motion.div
+                        key="flash"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.1 }}
+                        className="absolute inset-0 z-10 bg-white"
                       />
-                    </motion.div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-          <div className="w-full max-w-7xl p-12 space-y-16 mt-20 md:mt-0">
-            <h2 className="text-4xl md:text-5xl font-bold text-nozu-electric-blue">Our Mission</h2>
-            <div className="space-y-12">
-              <p className="text-lg text-nozu-dark-grey">At NozuDrones, we believe that the sky is not the limit, it’s just the beginning. Our mission is to empower everyone from hobbyists to professionals to master the art of flight.</p>
-              <p className="text-lg text-nozu-dark-grey">We provide comprehensive, up-to-date resources on the latest drone technology, safety regulations, and flying techniques, all tailored for the UK market.</p>
-              <p className="text-lg text-nozu-dark-grey">Our content is meticulously researched and verified by experts, ensuring you get the most accurate and reliable information possible. We are dedicated to building a community of knowledgeable and responsible drone pilots.</p>
-              <p className="text-lg text-nozu-dark-grey">Whether you're looking for your first drone, seeking to upgrade your professional gear, or simply want to stay on top of the latest laws, NozuDrones is your trusted guide.</p>
+                    )}
+                    {(animationStep >= 3) && (
+                      <motion.div
+                        key="controller"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute inset-0 w-full h-full"
+                      >
+                        <Image
+                          src="/drone-controller.webp"
+                          alt="Person operating drone with controller"
+                          fill
+                          className="object-cover"
+                        />
+                      </motion.div>
+                    )}
+                    {(animationStep >= 3) && (
+                      <motion.div
+                        key="animated-image"
+                        initial={{ 
+                          scale: 1, 
+                          opacity: 1, 
+                          top: "50%", 
+                          left: "50%", 
+                          translateX: "-50%", 
+                          translateY: "-50%", 
+                        }}
+                        animate={animationStep >= 4 ? { 
+                          opacity: 1,
+                          top: '52.87%',
+                          left: '38.75%',
+                          width: '12.12%',
+                          height: '17.80%',
+                          rotate: '-11.4deg',
+                          translateX: "0%",
+                          translateY: "0%",
+                          transition: { duration: 1, ease: "easeInOut" } 
+                        } : {}}
+                        exit={{ opacity: 0, transition: { duration: 0.5 } }}
+                        className="absolute"
+                        style={{ transformOrigin: 'top left' }}
+                      >
+                        <Image
+                          src="/desert.webp"
+                          alt="Still frame from video"
+                          fill
+                          className="object-cover"
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+              </div>
+              {/* This is the bottom-left item (Safety) */}
+              <motion.div
+                initial={coreMessageGridContent.bottomLeft.animation.initial}
+                whileInView={coreMessageGridContent.bottomLeft.animation.whileInView}
+                transition={coreMessageGridContent.bottomLeft.animation.transition}
+                viewport={{ once: true, amount: 0.3 }}
+                className={`flex flex-col justify-center space-y-6 p-8 bg-nozu-lime-green-refined/30 min-h-[300px]`}
+              >
+                <h3 className="text-3xl md:text-4xl font-bold text-nozu-electric-blue">
+                  {coreMessageGridContent.bottomLeft.title}
+                </h3>
+                <p 
+                  className="text-lg text-nozu-dark-grey"
+                  dangerouslySetInnerHTML={{ __html: coreMessageGridContent.bottomLeft.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}
+                />
+              </motion.div>
+              {/* This is the bottom-right item (Legal) */}
+              <motion.div
+                initial={coreMessageGridContent.bottomRight.animation.initial}
+                whileInView={coreMessageGridContent.bottomRight.animation.whileInView}
+                transition={coreMessageGridContent.bottomRight.animation.transition}
+                viewport={{ once: true, amount: 0.3 }}
+                className={`flex flex-col justify-center space-y-6 p-8 bg-nozu-electric-blue/30 min-h-[300px]`}
+              >
+                <h3 className="text-3xl md:text-4xl font-bold text-nozu-electric-blue">
+                  {coreMessageGridContent.bottomRight.title}
+                </h3>
+                <p 
+                  className="text-lg text-nozu-dark-grey"
+                  dangerouslySetInnerHTML={{ __html: coreMessageGridContent.bottomRight.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}
+                />
+              </motion.div>
             </div>
           </div>
         </section>
