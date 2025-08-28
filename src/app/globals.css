@@ -1,9 +1,19 @@
-/* src/app/globals.css v1.0.0 */
+/* src/app/globals.css v1.0.3 */
+/* Merged with new hero section styles and other fixes. */
 
 /* Tailwind CSS v3 directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom font definitions */
+@font-face {
+    font-family: 'Nozu';
+    src: url('/fonts/GT-America-Compressed-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
 
 /* Adjust scroll position for sticky headers */
 html {
@@ -20,8 +30,7 @@ html {
 html,
 body {
     max-width: 100vw;
-    overflow-x: hidden; /* Prevent horizontal scroll */
-    height: 100%;      /* Ensure html takes full viewport height for sticky to work */
+    min-height: 100%;
 }
 
 body {
@@ -104,44 +113,49 @@ a {
 
 /* New Hero Section CSS - Placed at the end for clarity */
 .hero-section {
-  position: relative;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-  background-color: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
 .video-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
 }
 
 .hero-video {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity 1s ease-in-out;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
 }
 
 .hero-video.active {
-  opacity: 0.6; /* Video opacity is 60% */
+    opacity: 0.6; /* Video opacity is 60% */
 }
 
 .overlay {
-  position: relative;
-  z-index: 2;
-  color: white;
-  padding: 1rem;
+    position: relative;
+    z-index: 2;
+    color: white;
+    padding: 1rem;
+}
+
+/* Additional utility class */
+.pan-left-to-center {
+  object-position: 0% 50%;
 }
