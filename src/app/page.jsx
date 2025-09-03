@@ -1,18 +1,21 @@
-// src/app/page.jsx v2.41.32
-// Refactored the Hero Section and Scrollytelling Section into their own components to improve modularity and reduce file size.
+// src/app/page.jsx v2.42.0
+// Version Log (Top of File)
+// - [2025-09-03] v2.42.0: Replaced ScrollytellingSection with ThreeKeysSection for a lighter, more reliable Section 2.
+// - [2025-09-03] v2.41.32: Refactored Hero & Scrollytelling into separate components to improve modularity.
+
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, motion, useInView, useAnimation } from 'framer-motion';
 import HeroSection from '@/components/HeroSection';
-import ScrollytellingSection from '@/components/ScrollytellingSection';
+import ThreeKeysSection from '@/components/ThreeKeysSection';
 
 const specsSpotlightData = [
-  { message: "Precision Gimbal", time: 0, link: "/guides/gimbal-tech" },
-  { message: "High-Powered Motor", time: 1.5, link: "/guides/motor-tech" },
-  { message: "Advanced Battery System", time: 3.5, link: "/guides/battery-tech" },
-  { message: "UK-Compliant Sensors", time: 5.5, link: "/guides/sensor-tech" },
+  { message: 'Precision Gimbal', time: 0,   link: '/guides/gimbal-tech' },
+  { message: 'High-Powered Motor', time: 1.5, link: '/guides/motor-tech' },
+  { message: 'Advanced Battery System', time: 3.5, link: '/guides/battery-tech' },
+  { message: 'UK-Compliant Sensors', time: 5.5, link: '/guides/sensor-tech' },
 ];
 
 export default function Home() {
@@ -34,7 +37,6 @@ export default function Home() {
   useEffect(() => {
     const videoElement = specsVideoPlayerRef.current;
     if (!videoElement) return;
-
     if (isSpecsSectionInView) {
       videoElement.play();
     } else {
@@ -46,24 +48,28 @@ export default function Home() {
     const videoElement = specsVideoPlayerRef.current;
     if (!videoElement) return;
 
-    const unsub = () => {
-      specsSpotlightData.forEach((item) => {
-        if (videoElement.currentTime >= item.time) {
-          setCurrentSpecsMessage(item);
+    const onTimeUpdate = () => {
+      // Pick the latest message whose time has passed
+      for (let i = specsSpotlightData.length - 1; i >= 0; i--) {
+        if (videoElement.currentTime >= specsSpotlightData[i].time) {
+          setCurrentSpecsMessage(specsSpotlightData[i]);
+          break;
         }
-      });
+      }
     };
-    
-    videoElement.addEventListener('timeupdate', unsub);
-    return () => videoElement.removeEventListener('timeupdate', unsub);
+
+    videoElement.addEventListener('timeupdate', onTimeUpdate);
+    return () => videoElement.removeEventListener('timeupdate', onTimeUpdate);
   }, []);
 
   return (
     <>
       <HeroSection className="mt-0" />
 
-      <ScrollytellingSection />
+      {/* Section 2: Three Keys */}
+      <ThreeKeysSection />
 
+      {/* Section 3: Drone Specs Spotlight */}
       <section
         ref={specsVideoRef}
         className="relative bg-nozu-white py-20 px-4 min-h-[400vh] flex flex-col items-center"
@@ -72,7 +78,10 @@ export default function Home() {
           Drone Specs Spotlight
         </h2>
 
-        <div ref={specsInViewRef} className="sticky top-0 w-full max-w-7xl h-screen flex items-center justify-center">
+        <div
+          ref={specsInViewRef}
+          className="sticky top-0 w-full max-w-7xl h-screen flex items-center justify-center"
+        >
           <div className="relative w-full h-[80vh] overflow-hidden">
             <video
               ref={specsVideoPlayerRef}
@@ -107,14 +116,14 @@ export default function Home() {
           </div>
         </div>
 
-        {specsSpotlightData.map((item, index) => (
+        {specsSpotlightData.map((_, index) => (
           <div key={index} className="h-[100vh] flex items-center justify-center">
-            <div ref={specsStepRefs.current[index]}>
-            </div>
+            <div ref={specsStepRefs.current[index]} />
           </div>
         ))}
       </section>
 
+      {/* Section 4: Safety teaser */}
       <section className="relative z-10 py-20 px-10 bg-nozu-lime-green-refined/30">
         <div className="max-w-5xl mx-auto text-center space-y-12">
           <div className="p-8 bg-white/10 backdrop-blur-sm border border-white/20">
@@ -122,7 +131,8 @@ export default function Home() {
               Your Guide to UK Drone Laws
             </h2>
             <p className="text-lg text-nozu-dark-grey mt-4">
-              We're committed to keeping you compliant and safe. Our resources are regularly updated to reflect the latest CAA regulations.
+              We&apos;re committed to keeping you compliant and safe. Our resources are regularly
+              updated to reflect the latest CAA regulations.
             </p>
             <Link
               href="/laws/uk-drone-code"
@@ -136,3 +146,6 @@ export default function Home() {
     </>
   );
 }
+
+// Version Log (Bottom Archive)
+// - (none)
