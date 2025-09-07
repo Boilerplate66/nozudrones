@@ -1,10 +1,26 @@
-/* src/app/globals.css v1.0.3 */
-/* Merged with new hero section styles and other fixes. */
+/* src/app/globals.css v1.0.5 */
+/* Version Log (Top of File)
+   - [2025-09-04] v1.0.5: Increased Three Keys brightness for images; flipped corner wash to light (white) to support dark text.
+   - [2025-09-04] v1.0.4: Added fineline token (--nozu-accent-thin) and Three Keys media utilities (.threekeys-filter, .threekeys-tint, .threekeys-cornerwash).
+   - [2025-09-03] v1.0.3: Merged with new hero section styles and other fixes.
+*/
 
 /* Tailwind CSS v3 directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Global tokens */
+:root {
+  /* Fineline highlight thickness */
+  --nozu-accent-thin: 2px;
+
+  /* Three Keys media treatment */
+  --tk-blur: 1.5px;          /* Low blur for hinting subject */
+  --tk-saturate: 0.85;       /* Mild desaturation */
+  --tk-contrast: 1.06;       /* Slight contrast pop */
+  --tk-brightness: 1.10;     /* Brighter for dark text (was 0.98) */
+}
 
 /* Custom font definitions */
 @font-face {
@@ -57,28 +73,28 @@ a {
 
 /* Styles for the contents menu items and the active state */
 .contents-menu-item {
-    position: relative; /* Needed for ::before pseudo-element positioning */
-    padding-left: 1.5rem; /* Make space for the indicator bar */
-    line-height: 1.5; /* Adjust as needed for your specific font-size */
-    display: block; /* Ensure it takes full width for padding/hover area */
+    position: relative;
+    padding-left: 1.5rem;
+    line-height: 1.5;
+    display: block;
 }
 
 /* Subtler active state */
 .active-section-link {
     color: theme('colors.nozu-electric-blue');
-    font-weight: 500; /* Medium font weight, less bold */
+    font-weight: 500;
 }
 
 .active-section-link::before {
     content: '';
     position: absolute;
-    left: 0px; /* Adjusted to be at the very left edge of the padding */
-    top: 50%; /* Vertically center the bar */
+    left: 0px;
+    top: 50%;
     transform: translateY(-50%);
-    width: 4px; /* Thickness of the bar */
-    height: 80%; /* Height of the bar relative to the list item */
-    background-color: theme('colors.nozu-electric-blue'); /* Example: using electric blue for active indicator */
-    border-radius: 2px; /* Slightly rounded ends */
+    width: 4px;
+    height: 80%;
+    background-color: theme('colors.nozu-electric-blue');
+    border-radius: 2px;
 }
 
 /* Hover state remains a separate color change */
@@ -86,6 +102,7 @@ a {
     color: theme('colors.nozu-electric-blue');
     font-weight: 500;
 }
+
 /* ensure all headings respect the dynamic header offset */
 .prose h2,
 .prose h3,
@@ -94,24 +111,22 @@ a {
 }
 
 /* ---- New CSS for mobile layout ---- */
-
-/* Hides the sidebar completely on mobile and sets it to stick to the top on larger screens */
 .nozu-mobile-sidebar-container {
-    display: none; /* Default to hidden on mobile */
+    display: none;
 }
 
 @media (min-width: 768px) {
     .nozu-mobile-sidebar-container {
-        display: block; /* Show as a block on medium screens and up */
+        display: block;
     }
 }
 
-/* Custom utility for text shadow, to ensure readability over video */
+/* Custom utility for text shadow (legacy video readability) */
 .text-shadow-lg {
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.75);
 }
 
-/* New Hero Section CSS - Placed at the end for clarity */
+/* New Hero Section CSS */
 .hero-section {
     position: relative;
     height: 100vh;
@@ -145,7 +160,7 @@ a {
 }
 
 .hero-video.active {
-    opacity: 0.6; /* Video opacity is 60% */
+    opacity: 0.6;
 }
 
 .overlay {
@@ -158,4 +173,31 @@ a {
 /* Additional utility class */
 .pan-left-to-center {
   object-position: 0% 50%;
+}
+
+/* === Three Keys media utilities === */
+.threekeys-filter {
+  /* Subtle flatten for busy photos: low blur + mild desat + contrast + brighter base */
+  filter:
+    saturate(var(--tk-saturate))
+    contrast(var(--tk-contrast))
+    brightness(var(--tk-brightness))
+    blur(var(--tk-blur));
+  will-change: transform, filter;
+  backface-visibility: hidden;
+}
+
+.threekeys-tint {
+  background: var(--tk-tint, transparent);
+  mix-blend-mode: multiply; /* gentle, keeps luminosity */
+  opacity: 1;
+}
+
+.threekeys-cornerwash {
+  /* Lighter bottom-right vignette to support dark text */
+  background: radial-gradient(
+    circle at 85% 85%,
+    rgba(255, 255, 255, 0.45),
+    transparent 45%
+  );
 }

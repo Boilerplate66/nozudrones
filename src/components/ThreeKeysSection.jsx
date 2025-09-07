@@ -1,8 +1,8 @@
-// src/components/ThreeKeysSection.jsx v1.4.0
+// src/components/ThreeKeysSection.jsx v1.4.11
 // Version Log (Top of File)
-// - [2025-09-03] v1.4.0: Cards fly in from further outside; zoom includes text as well as background; text sizes increased and alignment corrected; logo card redesigned with right-angle corner accent in nozu-electric-blue instead of border.
-// - [2025-09-03] v1.3.0: Cards made ~half height; added side slide-in + mirrored curtain; gap tightened to 16px; removed hover wobble and replaced with BG zoom; initial logo tile redesign.
-// - [2025-09-03] v1.2.0: Slower reveal, mirrored curtain toward center; logo tile with lockup; smaller cards.
+// - [2025-09-04] v1.4.11: Added subtle inner hover/tap zoom to the Nozu logo tile (lockup scales; container remains fixed).
+// - [2025-09-04] v1.4.10: Strapline made bold and pinned bottom-right via absolute positioning; added bottom padding reserve to prevent overlap. Titles/body unchanged.
+// - [2025-09-04] v1.4.9: Removed all image effects (filters/tints/overlays); images now render as-is. Layout, copy, links, and hover zoom unchanged.
 
 'use client';
 
@@ -10,28 +10,35 @@ import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import NozuLogo from '@/components/NozuLogo';
+import Link from 'next/link';
 
 const items = [
   {
     id: 'key-1',
-    title: 'Your Drone, Your Way.',
+    title: 'Choose the Right Drone',
     body:
-      'We help you choose the right model for your style, goals, and budget—without the noise.',
-    img: '/blue-ocean.webp', // replace with sky.webp later
+      'Overwhelmed by options? We help you cut through the noise to find the perfect drone for your goals, skills, and budget.',
+    strap: 'From confusion to clarity',
+    img: '/xp-1200x525.webp',
+    href: '/#choose',
   },
   {
     id: 'key-2',
-    title: 'Fly Safe, Fly Confident.',
+    title: 'Fly Safely',
     body:
-      'Clear checklists and essentials so every flight feels calm, capable, and under control.',
-    img: '/blue-ocean.webp', // replace with sea.webp later
+      'Safety made simple. We guide you through the essentials, so you can fly with confidence, knowing you have the skills to protect yourself, your drone, and others.',
+    strap: 'Confidence in the clouds.',
+    img: '/beech-1200x525.webp',
+    href: '/#fly-safe',
   },
   {
     id: 'key-3',
-    title: 'Know the Law, Fly Free.',
+    title: 'Fly Legally',
     body:
-      'UK-specific guidance and references so you can fly legally—and enjoy it more.',
-    img: '/blue-ocean.webp', // replace with forest.webp later
+      'Navigating UK drone law can be complex. We simplify the rules and show you what to do, so you can fly legally and worry-free.',
+    strap: 'Know the rules, enjoy the skies.',
+    img: '/twilight-cloud-1200x525.webp',
+    href: '/#fly-legal',
   },
 ];
 
@@ -102,82 +109,132 @@ export default function ThreeKeysSection() {
         {items.map((card, idx) => {
           const isRightCol = idx % 2 === 1;
           return (
-            <motion.article
-              key={card.id}
-              variants={cardVariants(isRightCol)}
-              whileHover={{ scale: 1.05 }}
-              className="
-                relative
-                aspect-[16/7]
-                overflow-hidden
-                group
-                bg-nozu-light-grey
-              "
-            >
-              {/* BG image */}
-              <div className="absolute inset-0">
-                <Image
-                  src={card.img}
-                  alt=""
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.10]"
-                  priority={false}
-                />
-                {/* wash overlay for text contrast */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent pointer-events-none" />
-              </div>
-
-              {/* Content (also scales on hover) */}
-              <motion.div
-                className="relative z-10 h-full flex flex-col justify-end p-4 md:p-6"
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.4 }}
+            <Link key={card.id} href={card.href} className="block">
+              <motion.article
+                variants={cardVariants(isRightCol)}
+                className="
+                  relative
+                  aspect-[16/7]
+                  overflow-hidden
+                  group
+                  bg-nozu-light-grey
+                "
               >
-                <h3 className="text-white text-lg md:text-2xl font-bold leading-tight">
-                  {card.title}
-                </h3>
-                <p className="mt-2 text-nozu-sky-blue text-sm md:text-lg max-w-[60ch]">
-                  {card.body}
-                </p>
-              </motion.div>
-            </motion.article>
+                {/* Media (no filters/tints/overlays) */}
+                <div className="absolute inset-0">
+                  <Image
+                    src={card.img}
+                    alt=""
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="
+                      object-cover
+                      transition-transform duration-500 ease-out
+                      transform-gpu group-hover:scale-[1.10] group-active:scale-[1.10]
+                    "
+                    priority={false}
+                  />
+                </div>
+
+                {/* Content grid: Title (top-left), Body (center-left), Strap (absolute bottom-right) */}
+                <motion.div
+                  className="
+                    relative z-10 h-full
+                    grid grid-rows-[auto_1fr]
+                    p-4 md:p-6
+                    pb-12 md:pb-14
+                    transform-gpu transition-transform duration-400
+                    group-hover:scale-[1.05] group-active:scale-[1.05]
+                  "
+                >
+                  {/* Title — top-left */}
+                  <h3 className="text-nozu-dark-grey text-lg md:text-2xl font-bold leading-tight">
+                    {card.title}
+                  </h3>
+
+                  {/* Body — center-left */}
+                  <p className="self-center mt-2 text-nozu-dark-grey opacity-90 text-sm md:text-lg max-w-[60ch]">
+                    {card.body}
+                  </p>
+
+                  {/* Strapline — absolute bottom-right, bold */}
+                  <p
+                    className="
+                      absolute right-4 md:right-6 bottom-4 md:bottom-6
+                      text-right text-nozu-dark-grey opacity-90
+                      text-sm md:text-base font-bold
+                    "
+                  >
+                    {card.strap}
+                  </p>
+                </motion.div>
+              </motion.article>
+            </Link>
           );
         })}
 
         {/* Logo tile with right-angle accent */}
-        <motion.article
-          key="logo-tile"
-          variants={cardVariants(true)}
-          whileHover={{ scale: 1.02 }}
-          className="
-            relative
-            aspect-[16/7]
-            overflow-hidden
-            bg-white
-            flex items-center justify-center
-          "
-          aria-label="NozuDrones"
-        >
-          {/* Right-angle corner accent */}
-          <div className="absolute top-0 left-0 w-4 h-4 border-t-[4px] border-l-[4px] border-nozu-electric-blue" />
-          <div className="absolute bottom-0 right-0 w-4 h-4 border-b-[4px] border-r-[4px] border-nozu-electric-blue" />
+        <Link href="/about/nozudrones" aria-label="NozuDrones" className="block">
+          <motion.article
+            key="logo-tile"
+            variants={cardVariants(true)}
+            className="
+              relative
+              aspect-[16/7]
+              overflow-hidden
+              bg-white
+              flex items-center justify-center
+              group
+            "
+          >
+            {/* Right-angle corner accents; CSS var matches section underline */}
+            <div
+              className="absolute top-0 left-0 w-4 h-4 border-nozu-electric-blue"
+              style={{
+                borderTopWidth: 'var(--nozu-accent-thin, 2px)',
+                borderLeftWidth: 'var(--nozu-accent-thin, 2px)',
+              }}
+            />
+            <div
+              className="absolute bottom-0 right-0 w-4 h-4 border-nozu-electric-blue"
+              style={{
+                borderBottomWidth: 'var(--nozu-accent-thin, 2px)',
+                borderRightWidth: 'var(--nozu-accent-thin, 2px)',
+              }}
+            />
 
-          {/* Centered lockup */}
-          <div className="flex flex-col items-center gap-3 md:gap-4 text-center">
-            <NozuLogo width={140} height={60} />
-            <div className="leading-none">
-              <div className="text-2xl md:text-4xl font-extrabold tracking-tight">
-                <span className="text-nozu-dark-grey">Nozu</span>
-                <span className="text-nozu-electric-blue">Drones</span>
+            {/* Centered lockup (scales on hover/tap) */}
+            <div
+              className="
+                flex flex-col items-center gap-3 md:gap-4 text-center
+                transform-gpu transition-transform duration-400 ease-out
+                group-hover:scale-[1.05] group-active:scale-[1.05]
+              "
+            >
+              <NozuLogo width={140} height={60} />
+              <div className="leading-none">
+                <div className="text-2xl md:text-4xl font-extrabold tracking-tight">
+                  <span className="text-nozu-dark-grey">Nozu</span>
+                  <span className="text-nozu-electric-blue">Drones</span>
+                </div>
+                <p className="mt-2 text-nozu-medium-grey text-sm md:text-base">
+                  Your UK Drone Companion
+                </p>
               </div>
-              <p className="mt-2 text-nozu-medium-grey text-sm md:text-base">
-                Your UK Drone Companion
-              </p>
             </div>
-          </div>
-        </motion.article>
+          </motion.article>
+        </Link>
       </motion.div>
     </section>
   );
 }
+
+// Archive (Bottom of File Log)
+// - [2025-09-04] v1.4.8: Updated background images to plain minimal assets: Choose → /xp-1200x525.webp; Safely → /beech-1200x525.webp; Legally → /twilight-cloud-1200x525.webp.
+// - [2025-09-04] v1.4.7: Switched card text to dark grey; brightened images and flipped overlays to light (white) gradients for readability. No animation/link changes.
+// - [2025-09-04] v1.4.5: Build fix — replaced TypeScript-style style key (['--tk-tint' as any]) with plain CSS var key ('--tk-tint') in .jsx.
+// - [2025-09-04] v1.4.4: Swapped real images; added CSS filters/tints; aligned content to Top/Center/Bottom layout.
+// - [2025-09-04] v1.4.3: Copy-only update. Titles clarified; bodies + straplines set. No layout/animation changes.
+// - [2025-09-03] v1.4.0: Cards fly in from further outside; zoom includes text as well as background; text sizes increased and alignment corrected; logo card redesigned with right-angle corner accent in nozu-electric-blue instead of border.
+// - [2025-09-03] v1.3.0: Cards made ~half height; added side slide-in + mirrored curtain; gap tightened to 16px; removed hover wobble and replaced with BG zoom; initial logo tile redesign.
+// - [2025-09-03] v1.2.0: Slower reveal, mirrored curtain toward center; logo tile with lockup; smaller cards.
