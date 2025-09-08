@@ -1,67 +1,18 @@
-// src/app/page.jsx v2.42.0
+// src/app/page.jsx v2.43.1
 // Version Log (Top of File)
+// - [2025-09-08] v2.43.1: Updated SpecsSection import to '@/components/SpecsSection' (no '/home'); no behavioural changes.
+// - [2025-09-08] v2.43.0: Extracted Drone Specs Spotlight into src/components/SpecsSection.jsx; added anchor id="choose"; simplified page. No visual/behaviour changes.
 // - [2025-09-03] v2.42.0: Replaced ScrollytellingSection with ThreeKeysSection for a lighter, more reliable Section 2.
-// - [2025-09-03] v2.41.32: Refactored Hero & Scrollytelling into separate components to improve modularity.
 
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { AnimatePresence, motion, useInView, useAnimation } from 'framer-motion';
 import HeroSection from '@/components/HeroSection';
 import ThreeKeysSection from '@/components/ThreeKeysSection';
-
-const specsSpotlightData = [
-  { message: 'Precision Gimbal', time: 0,   link: '/guides/gimbal-tech' },
-  { message: 'High-Powered Motor', time: 1.5, link: '/guides/motor-tech' },
-  { message: 'Advanced Battery System', time: 3.5, link: '/guides/battery-tech' },
-  { message: 'UK-Compliant Sensors', time: 5.5, link: '/guides/sensor-tech' },
-];
+import SpecsSection from '@/components/SpecsSection';
 
 export default function Home() {
-  const specsVideoRef = useRef(null);
-  const specsVideoPlayerRef = useRef(null);
-  const [currentSpecsMessage, setCurrentSpecsMessage] = useState(specsSpotlightData[0]);
-
-  const specsStepRefs = useRef(specsSpotlightData.map(() => React.createRef()));
-  const specsVideoController = useAnimation();
-  const specsInViewRef = useRef(null);
-  const isSpecsSectionInView = useInView(specsInViewRef, { once: true, amount: 0.5 });
-
-  useEffect(() => {
-    if (isSpecsSectionInView) {
-      specsVideoController.start('visible');
-    }
-  }, [isSpecsSectionInView, specsVideoController]);
-
-  useEffect(() => {
-    const videoElement = specsVideoPlayerRef.current;
-    if (!videoElement) return;
-    if (isSpecsSectionInView) {
-      videoElement.play();
-    } else {
-      videoElement.pause();
-    }
-  }, [isSpecsSectionInView]);
-
-  useEffect(() => {
-    const videoElement = specsVideoPlayerRef.current;
-    if (!videoElement) return;
-
-    const onTimeUpdate = () => {
-      // Pick the latest message whose time has passed
-      for (let i = specsSpotlightData.length - 1; i >= 0; i--) {
-        if (videoElement.currentTime >= specsSpotlightData[i].time) {
-          setCurrentSpecsMessage(specsSpotlightData[i]);
-          break;
-        }
-      }
-    };
-
-    videoElement.addEventListener('timeupdate', onTimeUpdate);
-    return () => videoElement.removeEventListener('timeupdate', onTimeUpdate);
-  }, []);
-
   return (
     <>
       <HeroSection className="mt-0" />
@@ -69,59 +20,8 @@ export default function Home() {
       {/* Section 2: Three Keys */}
       <ThreeKeysSection />
 
-      {/* Section 3: Drone Specs Spotlight */}
-      <section
-        ref={specsVideoRef}
-        className="relative bg-nozu-white py-20 px-4 min-h-[400vh] flex flex-col items-center"
-      >
-        <h2 className="text-4xl md:text-5xl font-bold text-nozu-electric-blue mb-20">
-          Drone Specs Spotlight
-        </h2>
-
-        <div
-          ref={specsInViewRef}
-          className="sticky top-0 w-full max-w-7xl h-screen flex items-center justify-center"
-        >
-          <div className="relative w-full h-[80vh] overflow-hidden">
-            <video
-              ref={specsVideoPlayerRef}
-              muted
-              playsInline
-              preload="auto"
-              className="absolute inset-0 w-full h-full object-cover"
-            >
-              <source src="/drone-landing-1920x1080.mp4" type="video/mp4" />
-            </video>
-
-            <div className="absolute inset-0 flex items-end justify-start p-10">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentSpecsMessage.message}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5 }}
-                  className="bg-black/50 backdrop-blur-sm p-6 text-white"
-                >
-                  <p className="text-2xl font-bold">{currentSpecsMessage.message}</p>
-                  <Link
-                    href={currentSpecsMessage.link}
-                    className="text-nozu-lime-green-refined hover:underline"
-                  >
-                    Learn More
-                  </Link>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </div>
-        </div>
-
-        {specsSpotlightData.map((_, index) => (
-          <div key={index} className="h-[100vh] flex items-center justify-center">
-            <div ref={specsStepRefs.current[index]} />
-          </div>
-        ))}
-      </section>
+      {/* Section 3: Drone Specs Spotlight (extracted) */}
+      <SpecsSection />
 
       {/* Section 4: Safety teaser */}
       <section className="relative z-10 py-20 px-10 bg-nozu-lime-green-refined/30">
